@@ -1,0 +1,15 @@
+---
+openldap_tag: '2.5.17'
+
+openldap_admin_pw: 'adminpassword'
+openldap_users: 'user1,user2'
+openldap_passwords: 'password1,password2'
+
+openldap_admin_user: 'admin'
+openldap_root_dn: 'dc={{ domain.split(".") | join(",dc=") }}'
+
+openldap_port: '1389'
+
+openldap_fourth_byte: '90'
+...
+# vim: set filetype=yaml

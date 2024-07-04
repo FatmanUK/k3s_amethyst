@@ -1,0 +1,13 @@
+---
+ansible_user: 'ansible'
+fqdn: '{{ inventory_hostname }}.{{ domain }}'
+
+k3s_arch: 'amd64'
+k3s_version: 'v1.28.10+k3s1'
+k3s_sha256_checksum: '2e90c4e696899ef37be871ec04986edac5ecf145da3e70e772e6c61f10b5400c'
+# TODO: look up https://github.com/k3s-io/k3s/releases/download/v1.28.10%2Bk3s1/sha256sum-amd64.txt
+# Find a mirror?
+
+k3s_tarball: '{{ playbook_dir }}/binaries/k3s-{{ k3s_version }}.tgz'
+...
+# vim: set filetype=yaml

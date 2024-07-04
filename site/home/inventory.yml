@@ -1,0 +1,54 @@
+---
+all:
+  vars:
+    distro: 'void'
+    domain: 'dreamtrack.test'
+    network: '10.11.0.0/24'
+    keepalived_vip_fourth_byte: '199'
+    keepalived_vip_interface: 'eth0'
+    loadbalancer_pool_network: '10.11.1.0/24'
+    loadbalancer_pool_name: 'dreamtrack-service-ip-pool'
+#    network_gateway: ''
+
+# no RHEL hosts here
+rhel:
+  children: { }
+
+void:
+  children:
+    nodes:
+    interface:
+
+vm_guests:
+  children:
+    void:
+
+k3s_primary_masters:
+  hosts:
+    k3s-mother-01:
+      ip_fourth_byte: '1'
+
+k3s_secondary_masters:
+  hosts:
+    k3s-mother-02:
+      ip_fourth_byte: '2'
+    k3s-mother-03:
+      ip_fourth_byte: '3'
+
+interface:
+  hosts: { }
+
+k3s_agents:
+  hosts:
+    k3s-child-01:
+      ip_fourth_byte: '11'
+    k3s-child-02:
+      ip_fourth_byte: '12'
+    k3s-child-03:
+      ip_fourth_byte: '13'
+    # k3s-child-04:
+    #   ip_fourth_byte: '14'
+    # k3s-child-05:
+    #   ip_fourth_byte: '15'
+...
+# vim: set filetype=yaml

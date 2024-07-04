@@ -1,0 +1,9 @@
+---
+grafana_tag: '10.0.12'
+
+grafana_disk_size_gb: 2
+grafana_port: '3000'
+
+grafana_fourth_byte: '70'
+...
+# vim: set filetype=yaml

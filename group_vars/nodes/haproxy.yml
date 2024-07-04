@@ -1,0 +1,5 @@
+---
+haproxy_version: 'v1.11'
+haproxy_tag: '1.11.0'
+...
+# vim: set filetype=yaml

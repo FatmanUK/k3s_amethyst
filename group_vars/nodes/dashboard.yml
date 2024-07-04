@@ -1,0 +1,7 @@
+---
+dashboard_tag: 'v2.7.0'
+metrics_scraper_ui_tag: 'v1.0.8'  # ?
+
+dashboard_fourth_byte: '80'
+...
+# vim: set filetype=yaml

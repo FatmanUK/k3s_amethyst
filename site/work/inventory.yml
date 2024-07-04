@@ -1,0 +1,50 @@
+---
+all:
+  vars:
+    distro: 'rhel'
+    domain: 'k3s.lab'
+    network: '10.20.0.0/24'
+    keepalived_vip_fourth_byte: '99'
+    keepalived_vip_interface: 'enp10s0'
+    loadbalancer_pool_network: '10.20.1.0/24'
+    loadbalancer_pool_name: 'cysafa-service-ip-pool'
+    network_gateway: '10.20.0.253'
+
+rhel:
+  children:
+    nodes:
+    interface:
+
+# no Void hosts here
+void:
+  children: { }
+
+vm_guests:
+  children:
+    rhel:
+
+k3s_primary_masters:
+  hosts:
+    k3s-mother-01:
+      ip_fourth_byte: '101'
+
+k3s_secondary_masters:
+  hosts:
+    k3s-mother-02:
+      ip_fourth_byte: '102'
+    k3s-mother-03:
+      ip_fourth_byte: '103'
+
+interface:
+  hosts: { }
+#    rancher-admin:
+#      ip_fourth_byte: '110'
+
+k3s_agents:
+  hosts:
+    k3s-child-01:
+      ip_fourth_byte: '111'
+    k3s-child-02:
+      ip_fourth_byte: '112'
+...
+# vim: set filetype=yaml

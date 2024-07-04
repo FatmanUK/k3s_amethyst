@@ -1,0 +1,17 @@
+---
+k3s_masters:
+  children:
+    k3s_primary_masters:
+    k3s_secondary_masters:
+
+# should be single host not group?
+keepalived_primaries:
+  children:
+    k3s_primary_masters:
+
+nodes:
+  children:
+    k3s_masters:
+    k3s_agents:
+...
+# vim: set filetype=yaml

@@ -1,0 +1,46 @@
+---
+k3s_clobber_files_distro:
+  - '/etc/systemd/system/k3s'
+  - '/etc/systemd/system/k3s.env'
+
+distro_pkgs:
+  - 'util-linux-user'
+  - 'iscsi-initiator-utils'
+
+service_command: 'systemctl'
+iscsi_iname_command: '/usr/sbin/iscsi-iname'
+
+extra_unmount_points:
+  - '/var/lib/nfs/rpc_pipefs'
+
+fstab_device: '/dev/sr0'
+fstab_mount: '/mnt/disc'
+
+install_command_prefix:
+  - '/bin/yum'
+  - 'localinstall'
+  - '--allowerasing'
+  - '--nogpgcheck'
+  - '--disablerepo=*'
+  - '-y'
+
+yum_repos:
+  - '/etc/yum.repos.d/media.repo'
+
+legacy_rpms:
+  - 'iptables-libs-1.6.2-2.fc28.x86_64.rpm'
+  - 'iptables-1.6.2-2.fc28.x86_64.rpm'
+
+prefix: '/tmp'
+prefixed_legacy_rpms: '{{ [prefix ~ "/"] | product(legacy_rpms) | map("join") | list }}'
+
+grub2_opts:
+  - 'nofb'
+  - 'nomodeset'
+  - 'VGA=640x480'
+  - 'crashkernel=auto'
+  - 'rd.lvm.lv=rhel_k3s-mother-001/root'
+  - 'cgroup_memory=1'
+  - 'cgroup_enable=memory'
+...
+# vim: set filetype=yaml

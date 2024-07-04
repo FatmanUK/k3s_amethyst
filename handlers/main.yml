@@ -1,0 +1,22 @@
+---
+- name: 'Restart keepalived'
+  become: yes
+  vars:
+    cmd:
+      - 'scripts/service_restart.bash'
+      - 'keepalived'
+  args:
+    executable: '/bin/bash'
+  script: '{{ cmd | join(" ") }}'
+
+- name: 'Restart sshd'
+  become: yes
+  vars:
+    cmd:
+      - 'scripts/service_restart.bash'
+      - 'sshd'
+  args:
+    executable: '/bin/bash'
+  script: '{{ cmd | join(" ") }}'
+...
+# vim: set filetype=yaml

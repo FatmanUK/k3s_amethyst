@@ -1,0 +1,13 @@
+---
+elasticsearch_version: '7.2.0'
+busybox_version: '1.36.1'
+
+elasticsearch_disk_size_gb: '10'
+elasticsearch_ui_port: '9200'
+elasticsearch_internal_port: '9300'
+
+kibana_ui_port: '5601'
+
+elasticsearch_fourth_byte: '50'
+...
+# vim: set filetype=yaml

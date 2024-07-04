@@ -1,0 +1,5 @@
+---
+#registry_pvc_storage_class: '{{ longhorn_storage_class }}'
+#registry_volume_mount_path: '/var/lib/registry'
+...
+# vim: set filetype=yaml

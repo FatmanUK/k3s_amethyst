@@ -1,0 +1,4 @@
+---
+ansible_host: '{{ network | ipv4(ip_fourth_byte) | ipv4("address") }}'
+...
+# vim: set filetype=yaml

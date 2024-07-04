@@ -1,0 +1,11 @@
+---
+longhorn_version: 'v1.5.3'
+
+local_path_storage_class: 'local-path-storage'
+longhorn_storage_class: 'longhorn'
+
+app_storage_class: 'longhorn'
+
+longhorn_ui_fourth_byte: '30'
+...
+# vim: set filetype=yaml

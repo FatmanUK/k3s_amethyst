@@ -1,0 +1,92 @@
+---
+# Install
+
+# Don't create roles by hosts. Create by objects.
+
+- name: 'Prep build host' # k3s_ready
+  hosts: 'all'         #    .
+  connection: 'local'  #   /!\
+  run_once: yes        #  '~~~`
+  become: no
+  tags:
+    - 'install'
+    - 'never'
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'k3s_tarball_prep'
+
+- name: 'Set up guests' # guest_ready
+  hosts: 'all'
+  gather_facts: no
+  become: yes
+  tags:
+    - 'install'
+    - 'never'
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'sysctl_setup'
+    #- 'shells_setup'
+    - 'logrotate_setup'
+    - 'selinux_setup'
+    #- 'file_systems_setup'
+    #- 'mount_points_setup'
+    - 'openssh_server_setup'
+
+- name: 'Prep Void Linux' # void_ready
+  hosts: 'void'
+  gather_facts: no
+  become: yes
+  tags:
+    - 'install'
+    - 'never'
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'xbps_setup'
+    - 'grub_setup'
+    - 'k3s_service_setup'
+    #- 'unneeded_files_delete'
+    - 'iptables_setup'
+    - 'dhcpcd_setup'
+
+- name: 'Base install' # nodes_ready images_ready k3s_base_install
+  hosts: 'nodes'
+  gather_facts: no
+  become: yes
+  tags:
+    - 'install'
+    - 'never'
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    #- 'swap_disable'
+    - 'k3s_directories_setup'
+    - 'iscsi_setup'  # for Longhorn
+    - 'chrony_setup'
+    - 'k3s_nodename_setup'
+    - 'hosts_file_setup'
+    #- 'images_ready'
+    - 'k3s_install'
+    - ''
+    # - 'do_nothing'        # these let me stop and start the roles
+    # - 'fail_egregiously'  # these let me stop and start the roles
+
+- name: 'Post-install auto-snapshot' # vm_snapshot_create
+  gather_facts: no
+  hosts: 'vm_guests'   #    .
+  connection: 'local'  #   /!\
+  run_once: no         #  '~~~`
+  become: no
+  vars:
+    snapshot_name: 'post-install'
+  tags:
+    - 'install'
+    - 'never'
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'snapshot_take'
+...
+# vim: set filetype=yaml

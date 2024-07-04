@@ -1,0 +1,8 @@
+---
+calico_version: 'v3.27.2'
+tigera_version: 'v1.32.5'
+
+calico_dir: '/var/lib/calico'
+nodename_file: '{{ calico_dir }}/nodename'
+...
+# vim: set filetype=yaml

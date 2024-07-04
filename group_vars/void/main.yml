@@ -1,0 +1,71 @@
+---
+k3s_clobber_files_distro:
+  - '/etc/sv/k3s'
+  - '/etc/xbps.d/rancher-k3s-common*.conf'
+  - '/var/service/k3s'
+
+distro_pkgs:
+  - 'nghttp2'
+  - 'libssh2'
+  - 'open-iscsi'
+  - 'jq'
+  - 'curl'
+
+service_command: '/usr/bin/sv'
+iscsi_iname_command: '/usr/bin/iscsi-iname'
+
+extra_unmount_points: []
+
+# a bit nondescript
+void_templates:
+  - '/etc/xbps.d/00-repository-main.conf'
+
+# a bit nondescript
+void_hosts:
+  - 'repo-default.voidlinux.org'
+
+grub2_opts:
+  - 'nofb'
+  - 'nomodeset'
+  - 'VGA=800x600'
+  - 'cgroup_memory=1'
+  - 'cgroup_enable=memory'
+  - 'loglevel=4'
+  - 'slub_debug=P'
+  - 'page_poison=1'
+  - 'net.ifnames=0'
+  - 'keymap=uk'
+  - 'drm.debug=0x1e'
+
+k3s_down_file: '{{ k3s_service_dir }}/down'
+
+k3s_service_dir: '/etc/sv/k3s'
+
+unneeded_services:
+  - 'agetty-hvc0'
+  - 'agetty-hvsi0'
+  - 'agetty-tty4'
+  - 'agetty-tty5'
+  - 'agetty-tty6'
+  - 'agetty-ttyAMA0'
+  - 'agetty-ttyUSB0'
+  - 'wpa_supplicant'
+
+unneeded_paths:
+  - '/etc/k3s-token'
+  - '/etc/k3s-token-file'
+  - '/etc/issue.new-0.140_8'
+  - '/etc/rc.conf.new-20210314_1'
+  - '/etc/cni/net.d'
+  - '/etc/myname'
+  - '/etc/rancher'
+  - '/etc/sudoers.new-1.9.5p2_2'
+  - '/usr/libexec/kubernetes'
+  - '/usr/lib/virt-sysprep'
+  - '/home/ansible/install_k3s.sh'
+  - '/home/ansible/k3s'
+  - '/var/lib/calico'
+  - '/var/lib/rancher'
+  - '/var/run/containerd'
+...
+# vim: set filetype=yaml

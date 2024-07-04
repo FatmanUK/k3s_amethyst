@@ -1,0 +1,52 @@
+---
+all:
+  vars:
+    distro: 'void'
+    domain: 'dreamtrack.net'
+    network: '10.7.6.0/24'
+    keepalived_vip_fourth_byte: '199'
+    keepalived_vip_interface: 'eth0'
+    loadbalancer_pool_network: '10.7.7.0/24'
+    loadbalancer_pool_name: 'dreamtrack-service-ip-pool'
+    network_gateway: '10.7.6.254'
+
+# no RHEL hosts here
+rhel:
+  children: { }
+
+void:
+  children:
+    nodes:
+    interface:
+
+vm_guests:
+  children: { }
+
+k3s_primary_masters:
+  hosts:
+    gang-mother-01:
+      ip_fourth_byte: '212'
+
+k3s_secondary_masters:
+  hosts:
+    gang-mother-02:
+      ip_fourth_byte: '213'
+    gang-mother-03:
+      ip_fourth_byte: '214'
+
+interface:
+  hosts: { }
+#    gang-admin-01:
+#      ip_fourth_byte: '110'
+
+# hmm, do I actually need agent nodes at all?
+k3s_agents:
+  hosts: { }
+#    gang-child-01:
+#      ip_fourth_byte: '215'
+    # theoretically possible 'gamma' device but broken
+    # gang-child-02:
+    #   ip_fourth_byte: '211'
+    # could add a FreeBSD RPi child node?
+...
+# vim: set filetype=yaml

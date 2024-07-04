@@ -1,0 +1,13 @@
+---
+prometheus_tag: 'v2.50.1'
+postgres_exporter_tag: 'v0.15.0'
+
+exporter_replicas: 1
+
+prometheus_port: '9090'
+prometheus_disk_size_gb: '5'
+prometheus_replicas: 1
+
+prometheus_fourth_byte: '60'
+...
+# vim: set filetype=yaml

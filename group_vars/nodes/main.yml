@@ -1,0 +1,60 @@
+---
+pause_seconds: 10
+
+nodes_timeout: '20m'
+
+default_selector_type: 'pod'
+default_want_condition: 'Ready'
+
+config_dir: '/etc/rancher/k3s'
+environment_file: '{{ config_dir }}/k3s.env'
+
+k3s_first_primary: '{{ groups.k3s_primary_masters | first }}'
+
+k3s_symlinks:
+  - 'kubectl'
+  - 'crictl'
+  - 'ctr'
+
+k3s_data_dirs:
+  - '{{ config_dir }}'
+  - '{{ calico_dir }}'
+  - '{{ k3s_config_dir }}/server'
+  - '{{ nodename_file | dirname }}'
+  - '{{ k3s_config_dir }}/agent/images'
+  - '/etc/iscsi'
+  - '/etc/chrony'
+
+k3s_config_dir: '/var/lib/rancher/k3s'
+k3s_token_file: '{{ k3s_config_dir }}/server/token'
+k3s_binary_dir: '/usr/local/bin'
+k3s_binary: '{{ k3s_binary_dir }}/k3s'
+
+manifest_cache_dir: '{{ playbook_dir }}/manifests'
+manifests_path_prefix: '/home/ansible/manifests'
+
+k3s_scripts:
+  - '{{ k3s_binary_dir }}/k3s-killall.sh'
+  - '{{ k3s_binary_dir }}/k3s-uninstall.sh'
+
+# TODO: use vip instead of k3s_first_primary
+k3s_master_domain: 'https://{{ k3s_first_primary }}.{{ domain }}'
+
+k3s_master_common_args:
+ - '--disable=servicelb'
+ - '--disable=traefik'
+ - '--flannel-backend=none'
+ - '--disable-network-policy'
+ - '--cluster-cidr=192.168.0.0/16'
+ - '--write-kubeconfig-mode=0644'
+ - '--cluster-init'
+
+k3s_master_common: '{{ k3s_master_common_args | join(" ") }}'
+
+k3s_master_url: '--server={{ k3s_master_domain }}:6443'
+
+k3s_master_token: '--token={{ server_token }}'
+
+kube_metrics_reader_name: 'metrics-reader'
+...
+# vim: set filetype=yaml

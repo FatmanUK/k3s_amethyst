@@ -1,0 +1,4 @@
+---
+metallb_version: 'v0.13.9'
+...
+# vim: set filetype=yaml

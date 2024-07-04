@@ -1,0 +1,4 @@
+---
+default_wait_timeout: '300s'
+...
+# vim: set filetype=yaml
