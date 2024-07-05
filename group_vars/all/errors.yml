@@ -1,0 +1,34 @@
+---
+e_mount_notfound_none: 'no mount point specified'  # crappy inaccurate error
+
+e_mount_notfound_fstab: "can't find in /etc/fstab."
+
+e_mount_already_not: 'not mounted'
+
+e_mount_already_already: 'already mounted'
+
+e_mount_no_media: 'no medium found'
+
+e_mount_not_exist: 'does not exist'
+
+e_touch_fail: 'could not touch target'
+
+e_manifest_already: 'Error from server (AlreadyExists)'
+
+e_manifest_namespace: 'does not match the namespace'
+
+e_wait_ok: 'condition met'
+
+e_selinux_notexists: 'does not exist'
+
+e_mkdir_readonly: 'Read-only file system'
+
+e_mkdir_exists: 'File exists'
+
+e_nonzero_rc: 'non-zero return code'
+
+e_ns_already: 'Error from server (AlreadyExists): namespaces'
+
+e_virsh_start_already: 'error: Domain is already active'
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,21 @@
+<%#
+---
+kind: PXELinux
+name: Flatcar Container Linux PXELinux
+model: ProvisioningTemplate
+oses:
+  - Flatcar
+description: |
+  The template to render PXELinux bootloader configuration for Flatcar
+  Container Linux distribution.
+  The output is deployed on the host's subnet TFTP proxy.
+-%>
+DEFAULT autoinstall
+PROMPT 1
+TIMEOUT 5
+
+DISPLAY boot.msg
+
+LABEL autoinstall
+    KERNEL <%= @kernel %>
+    APPEND initrd=<%= @initrd %> ipv6.disable=1 flatcar.first_boot=1 flatcar.autologin ignition.config.url=<%= foreman_url('provision')%>

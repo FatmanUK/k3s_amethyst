@@ -1,0 +1,11 @@
+---
+# Seems to happen a lot, so why not meta-ise the task?
+- name: 'Create root-owned directories'
+  when:
+    - 'item not in exempt_directories'
+  loop: '{{ paths }}'
+  file:
+    path: '{{ item }}'
+    state: 'directory'
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,6 @@
+---
+# TODO: add a list of excluded protected directories
+exempt_directories:
+  - '/etc'
+...
+# vim: set filetype=yaml:

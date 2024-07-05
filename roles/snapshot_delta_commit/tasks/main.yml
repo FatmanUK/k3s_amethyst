@@ -1,0 +1,24 @@
+---
+- name: 'Commit all snapshots'
+  register: 'reg_delete_snapshot'
+  vars:
+    e_ok: 'deleted'
+    e_notfound: 'the domain does not have a current snapshot'
+    # e_file: 'No such file or directory'
+    # e_denied: 'Permission denied'
+  retries: 10  # max number of snapshots
+  delay: 2
+  until: 'reg_delete_snapshot is success'
+  changed_when: no
+  failed_when:
+    - 'reg_delete_snapshot.rc == 0'
+    - 'e_ok in reg_delete_snapshot.stdout'
+    - 'e_notfound not in reg_delete_snapshot.stderr'
+  command:
+    argv:
+      - 'virsh'
+      - 'snapshot-delete'
+      - '--current'
+      - '{{ inventory_hostname + "." + domain | quote }}'
+...
+# vim: set filetype=yaml:

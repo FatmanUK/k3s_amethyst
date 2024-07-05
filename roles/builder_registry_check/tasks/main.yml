@@ -1,0 +1,24 @@
+---
+- name: 'Pull registry image'
+  connection: 'local'
+  run_once: yes
+  vars:
+    argv:
+      - 'scripts/podman_check_pull.bash'
+      - 'registry:{{ registry_tag }}'
+  args:
+    executable: '/bin/bash'
+  script: '{{ argv | join(" ") }}'
+
+- name: 'Start registry container'
+  connection: 'local'
+  run_once: yes
+  vars:
+    argv:
+      - 'scripts/registry_start_run.bash'
+      - '{{ registry_tag }}'
+  args:
+    executable: '/bin/bash'
+  script: '{{ argv | join(" ") }}'
+...
+# vim: set filetype=yaml:

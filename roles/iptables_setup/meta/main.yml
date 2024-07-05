@@ -1,0 +1,10 @@
+---
+dependencies:
+  - vars:
+      package_set: 'iptables'
+    role: 'meta_package_install'
+  - vars:
+      service: 'iptables'
+    role: 'meta_service_enable_and_stop'
+...
+# vim: set filetype=yaml:

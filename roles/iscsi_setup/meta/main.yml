@@ -1,0 +1,14 @@
+---
+dependencies:
+  - vars:
+      configs:
+        - '/etc/iscsi/iscsid.conf'
+    role: 'meta_rootfile_template'
+  - vars:
+      service: 'iscsi'
+    role: 'meta_service_enable_and_stop'
+  - vars:
+      service: 'iscsid'
+    role: 'meta_service_enable_and_stop'
+...
+# vim: set filetype=yaml:

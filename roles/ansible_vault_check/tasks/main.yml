@@ -1,0 +1,8 @@
+---
+- name: 'debug'
+  connection: 'local'
+  run_once: yes
+  debug:
+    msg: 'nothing'
+...
+# vim: set filetype=yaml:

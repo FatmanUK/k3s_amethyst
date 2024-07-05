@@ -1,0 +1,5 @@
+---
+- name: 'fail'
+  fail:
+...
+# vim: set filetype=yaml:

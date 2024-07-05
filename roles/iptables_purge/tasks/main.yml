@@ -1,0 +1,24 @@
+---
+- name: 'Create empty iptables settings file'
+  when:
+    - 'not has_sysconfig'
+    - 'has_iptables'
+  notify:
+    - 'Reload iptables'
+  copy:
+    remote_src: yes
+    src: '/etc/iptables/empty.rules'
+    dest: '/etc/iptables/iptables.rules'
+
+- name: 'Restore blank iptables config'
+  when:
+    - 'has_sysconfig'
+    - 'has_nftables'
+  notify:
+    - 'Reload nftables'
+  copy:
+    remote_src: yes
+    src: '/dev/null'
+    dest: '/etc/sysconfig/nftables.conf'
+...
+# vim: set filetype=yaml:

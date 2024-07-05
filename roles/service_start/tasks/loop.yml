@@ -1,0 +1,29 @@
+---
+- name: 'Output service name'
+  run_once: yes
+  debug:
+    var: 'item'
+
+- name: 'Remove down file'
+  when:
+    - 'has_runit'
+  file:
+    dest: '/etc/sv/{{ item }}/down'
+    state: 'absent'
+
+- name: 'Start runit service'
+  when:
+    - 'has_runit'
+  runit:
+    name: '{{ item }}'
+    state: 'started'
+
+- name: 'Start systemd service'
+  when:
+    - 'has_systemd'
+  systemd:
+    name: '{{ item }}'
+    enabled: yes
+    state: 'started'
+...
+# vim: set filetype=yaml:

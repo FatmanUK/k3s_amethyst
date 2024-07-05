@@ -1,0 +1,21 @@
+---
+- name: 'Checks'
+  import_playbook: 'checks.yml'
+
+- name: 'Purge k3s cluster'
+  hosts: 'nodes'
+  become: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'destroy'
+  roles:
+    - 'iptables_purge'     # install blank ruleset
+    - 'k3s_service_purge'  # disable, stop and delete k3s service
+    - 'k3s_mounts_purge'   # unmount kubelet and nfs, delete mount points
+    - 'k3s_configs_purge'  # delete unused k3s config files and directories (include a switch, default off)
+    - 'iscsi_purge'        # delete iscsi targets
+    - 'hosts_file_purge'   # restore the original (empty) hosts file --- maybe have one template with "purge" and "install" modes?
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,130 @@
+---
+- name: 'Export environment'
+  register: 'reg_environment'
+  vars:
+    cmd:
+      - 'scripts/env_dump.bash'
+  args:
+    executable: '/bin/bash'
+  script: '{{ cmd | join(" ") }}'
+
+- name: 'Delete environment settings'
+  file:
+    path: '{{ environment_file }}'
+    state: 'absent'
+
+- name: 'Touch environment settings'
+  file:
+    path: '{{ environment_file }}'
+    state: 'touch'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+
+- name: 'Create environment settings'
+  when: '"_PROXY" in item
+         or "_proxy" in item
+         or "K3S" in item
+         or "CONTAINERD" in item'
+  loop: '{{ reg_environment.stdout_lines }}'
+  lineinfile:
+    line: '{{ item }}'
+    dest: '{{ environment_file }}'
+    create: yes
+
+- name: 'Generate random token'
+  when:
+    - 'is_primary'
+  vars:
+    random_spec: '/dev/null chars=ascii_letters,digits length=64'
+    seed: '{{ fqdn ~ now().microsecond }}'
+    password: '{{ lookup("password", random_spec, seed=seed)
+                  | password_hash("sha256")
+                  | b64encode }}'
+    cmd: 'scripts/generate_k3s_random_token.bash'
+    args:
+      - '{{ password | quote }}'
+      - '{{ k3s_binary | quote }}'
+  args:
+    executable: '/bin/bash'
+  script: '{{ ([ cmd ] + args) | join(" ") }}'
+
+- name: 'Read token'
+  register: 'reg_token'
+  when:
+    - 'is_primary'
+#  run_once: yes
+  slurp:
+    path: '/var/lib/rancher/k3s/server/token'
+
+- name: 'Set token fact'
+  when:
+    - 'is_primary'
+  run_once: yes  # spreads the token to all hosts
+  set_fact:
+    server_token: '{{ reg_token.content | b64decode }}'
+
+- name: 'Prove all can access the token'
+  debug:
+    var: 'server_token'
+
+# The service files deliberately have a line missing. It's added here.
+# TODO: maybe use replace instead so it's more obvious in the file?
+- name: 'Append final line to service file'
+  vars:
+    path_systemd: '/usr/lib/systemd/system/k3s.service'
+    path_runit: '/etc/sv/k3s/conf'
+    line_systemd: 'ExecStart=/usr/local/bin/k3s {{ k3s_service_opts_str }}'
+    line_runit: 'OPTS="{{ k3s_service_opts_str }}"'
+  lineinfile:
+    path: '{{ path_systemd if has_systemd else path_runit }}'
+    line: '{{ line_systemd if has_systemd else line_runit }}'
+    insertafter: 'EOF'
+
+
+
+#- name: 'Reboot'
+#  #command: 'reboot'
+#  reboot:
+#    pre_reboot_delay: '{{ pre_reboot_delay_s | int }}'
+#    post_reboot_delay: '{{ post_reboot_delay_s | int }}'
+#
+#- name: 'Wait for system to settle'
+#  when: 'settle_delay_s is defined'
+#  vars:
+#    delay_text: '{{ (settle_delay_s ~ "s")
+#                    if (settle_delay_s < 60)
+#                    else (((settle_delay_s / 60) | int) ~ "m") }}'
+#  pause:
+#    prompt: |
+#      This might take a while. Pausing for {{ delay_text }}.
+#    seconds: '{{ settle_delay_s | int }}'
+#
+- name: 'Wait for nodes to exist'
+  register: 'reg_nodes'
+  delegate_to: '{{ groups.primaries | first }}'
+  retries: 100
+  delay: 20
+  until:
+    - 'reg_nodes is success'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'get'
+      - 'node'
+      - '{{ inventory_hostname }}.{{ domain }}'
+
+- name: 'Generate API tokens'
+  register: 'reg_api_tokens'
+  when:
+    - 'is_primary'
+  args:
+    stdin: '{{ lookup("template", "api_tokens.yaml.j2") }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'apply'
+      - '-f'
+      - '-'
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,107 @@
+---
+has_iptables: yes
+has_nftables: no
+has_sysconfig: no
+has_systemd: no
+has_runit: yes
+has_xbps: yes
+has_yum: no
+has_apt: no
+has_dhcpcd: yes
+
+update_servers:
+  - ip: '65.21.160.177'
+    domain: 'voidlinux.org'
+    hostname: 'repo-default'
+
+mandatory_access_control: 'apparmor'
+
+console_resolution: '896x504'
+
+grub_linux_command_args:
+  - 'nofb'
+  - 'nomodeset'
+  - 'loglevel=4'
+  - 'slub_debug=P'
+  - 'page_poison=1'
+  - 'VGA={{ console_resolution }}'
+  - 'cgroup_memory=1'
+  - 'cgroup_enable=memory'
+  - 'net.ifnames=0'
+  - 'apparmor=1'
+  - 'security=apparmor'
+  - 'keymap=uk'
+  - 'drm.debug=0x1e'
+  - 'vt.default_red=0xee,0xdc,0x85,0xb5,0x26,0xd3,0x2a,0x07,0xfd,0xcb,0x93,0x83,0x65,0x6c,0x58,0x00'
+  - 'vt.default_grn=0xe8,0x32,0x99,0x89,0x8b,0x36,0xa1,0x36,0xf6,0x4b,0xa1,0x94,0x7b,0x71,0x6e,0x2b'
+  - 'vt.default_blu=0xd5,0x2f,0x00,0x00,0xd2,0x82,0x98,0x42,0xe3,0x16,0xa1,0x96,0x83,0xc4,0x75,0x36'
+grub_enable_blscfg: no
+
+# install libosinfo and osinfo-db
+# osinfo-query os | grep ...
+libosinfo_base_url: 'http://voidlinux.org/voidlinux'
+os_version: 'rolling'
+
+xbps_update_server: 'https://repo-fastly.voidlinux.org/current'
+
+package_manager: 'xbps'
+packages_on_disc: no
+packages:
+  selinux: [ ]
+#    - 'container-selinux'
+#    - 'fapolicyd-selinux'
+#    - 'libselinux'
+#    - 'libsepol'
+#    - 'selinux-policy'
+#    - 'libsemanage'
+#    - 'libsepol'
+  apparmor:
+    - 'apparmor'
+    - 'libapparmor'
+    - 'runit-void-apparmor'
+  logrotate:
+    - 'logrotate'
+  rsyslog:
+    - 'rsyslog'
+  iptables:
+    - 'iptables'
+  chrony:
+    - 'chrony'
+
+standard_logs:
+  - '/var/log/secure'
+  - '/var/log/messages'
+  - '/var/log/kernel'
+  - '/var/log/cron'
+  - '/var/log/sensors'
+  - '/var/log/maillog'
+
+unneeded_services:
+  - 'agetty-hvc0'
+  - 'agetty-hvsi0'
+  - 'agetty-tty4'
+  - 'agetty-tty5'
+  - 'agetty-tty6'
+  - 'agetty-ttyAMA0'
+  - 'agetty-ttyUSB0'
+  - 'k3s'
+  - 'wpa_supplicant'
+
+unneeded_paths:
+  - '/etc/k3s-token'
+  - '/etc/k3s-token-file'
+  - '/etc/issue.new-0.140_8'
+  - '/etc/rc.conf.new-20210314_1'
+  - '/etc/cni/net.d'
+  - '/etc/myname'
+  - '/etc/rancher'
+  - '/etc/sudoers.new-1.9.5p2_2'
+  - '/usr/libexec/kubernetes'
+  - '/usr/lib/virt-sysprep'
+  - '/home/ansible/install_k3s.sh'
+  - '/home/ansible/k3s'
+  - '/var/lib/calico'
+  - '/var/lib/rancher'
+  - '/var/run/containerd'
+...
+# vim: set filetype=yaml:

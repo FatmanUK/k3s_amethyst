@@ -1,0 +1,34 @@
+---
+k3s_data_dirs:
+  - '{{ environment_file | dirname }}'
+  - '{{ calico_dir }}'
+
+k3s_binary_dir: '/usr/local/bin'
+
+k3s_symlinks:
+  - 'kubectl'
+  - 'crictl'
+  - 'ctr'
+
+k3s_scripts:
+  - '{{ k3s_binary_dir }}/k3s-killall.sh'
+  - '{{ k3s_binary_dir }}/k3s-uninstall.sh'
+
+environment_file: '/etc/rancher/k3s/k3s.env'
+
+calico_dir: '/var/lib/calico'
+
+# There should be a better way than this!
+host_entries: '{%
+  set he = [] %}{%
+  for host in groups.foreman + groups.nodes %}{%
+    set hv = hostvars[host] %}{%
+    set h = {
+      "ip": hv.ansible_host,
+      "domain": domain,
+      "hostname": hv.inventory_hostname } %}{%
+    set tmp = he.append(h) %}{%
+  endfor
+  %}{{ he }}'
+...
+# vim: set filetype=yaml:

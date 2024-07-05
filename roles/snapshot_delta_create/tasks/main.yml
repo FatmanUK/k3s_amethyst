@@ -1,0 +1,10 @@
+---
+- name: 'Create a snapshot image'
+  command:
+    argv:
+      - 'virsh'
+      - 'snapshot-create-as'
+      - '{{ inventory_hostname + "." + domain | quote }}'
+      - '{{ snapshot_name }}'
+...
+# vim: set filetype=yaml:-

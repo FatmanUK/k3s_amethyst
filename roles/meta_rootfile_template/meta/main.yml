@@ -1,0 +1,9 @@
+---
+# don't like to meta a meta, but just this once...
+# no, don't do it ever! dependencies get weird and hard to debug.
+#dependencies:
+#  - vars:
+#      paths: '{{ dir_paths }}'
+#    role: 'meta_rootdir_create'
+...
+# vim: set filetype=yaml:

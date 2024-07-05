@@ -1,0 +1,45 @@
+---
+- name: 'Create iptables config directory'
+  when:
+    - 'has_iptables'
+    - 'not has_sysconfig'
+  file:
+    path: '/etc/iptables'
+    state: 'directory'
+
+# can't meta-template this, special condition
+# hmm, maybe do this template like hosts file? ie setup and purge in one file
+- name: 'Create iptables file'
+  when:
+    - 'has_iptables'
+  vars:
+    path_with_sysconfig: '/etc/sysconfig/iptables'
+    path_sans_sysconfig: '/etc/iptables/iptables.rules'
+  template:
+    src: 'etc/iptables/iptables.rules.j2'
+    dest: '{{ path_with_sysconfig
+              if has_sysconfig
+              else path_sans_sysconfig }}'
+
+- name: 'Copy legacy RPMs'
+  when:
+    - 'has_yum'
+  loop: '{{ legacy_rpms }}'
+  copy:
+    src: 'rpms/{{ item }}'
+    dest: '/tmp/'
+
+# TODO: figure out failed_when for yum install and changed_when
+# so we don't reboot every time
+- name: 'Install legacy RPMs'
+  when:
+    - 'has_yum'
+  register: 'reg_iptables'
+  vars:
+    cmd:
+      - 'scripts/yum_install.bash'
+  args:
+    executable: '/bin/bash'
+  script: '{{ (cmd + prefixed_legacy_rpms) | join(" ") }}'
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,44 @@
+---
+- name: 'Download base image list'
+  register: 'reg_base_images'
+  connection: 'local'
+  run_once: yes
+  become: no
+  retries: 5
+  delay: 5
+  until: 'reg_base_images is success'
+  get_url:
+    url: '{{ k3s_image_list_url }}'
+    dest: '{{ image_list_file }}'
+    checksum: 'sha256:{{ k3s_image_list_sha256_checksum }}'
+    use_proxy: no
+
+- name: 'Record list of base images'
+  connection: 'local'
+  run_once: yes
+  vars:
+    command: 'less {{ image_list_file }}'
+  set_fact:
+    k3s_base_images_list: '{{ lookup("lines", command).split(",") }}'
+
+- name: 'Remove interim file'
+  connection: 'local'
+  run_once: yes
+  file:
+    path: '{{ image_list_file }}'
+    state: 'absent'
+
+- name: 'Pull missing images'
+  register: 'reg_check_pull'
+  become: no
+  connection: 'local'
+  run_once: yes
+  failed_when: no
+  vars:
+    cmd:
+      - 'scripts/registry_check_pull.bash'
+  args:
+    executable: '/bin/bash'
+  script: '{{ (cmd + k3s_base_images_list) | join(" ") }}'
+...
+# vim: set filetype=yaml:

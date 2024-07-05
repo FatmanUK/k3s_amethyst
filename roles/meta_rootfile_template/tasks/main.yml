@@ -1,0 +1,20 @@
+---
+- name: 'Create missing directories'
+  vars:
+    paths: '{{ dir_paths }}'
+  include_role:
+    name: 'meta_rootdir_create'
+
+# Template in root-owned config files, mode 0644
+# Hmm. This shouldn't find the template, but it does? Better pathing
+# in recent Ansibles or what?
+- name: 'Template in root-owned configs'
+  loop: '{{ configs }}'
+  template:
+    src: '{{ item[1:] }}.j2'
+    dest: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+...
+# vim: set filetype=yaml:

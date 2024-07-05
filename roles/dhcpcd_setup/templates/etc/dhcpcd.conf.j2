@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+
+# TODO: what do these do? Find out and enable/remove
+#controlgroup wheel
+#duid
+#persistent
+#vendorclassid
+#option domain_name_servers, domain_name, domain_search
+#option classless_static_routes
+#option interface_mtu
+#option host_name
+#option rapid_commit
+#require dhcp_server_identifier
+#slaac private
+interface eth0
+	static ip_address={{ subnet | ipaddr(host_id) }}
+	static routers={{ network_gateway }}
+	static domain_name_servers={{ network_gateway }} {{ extra_name_servers }}
+	static domain_search={{ domain }}
+	noipv6
+	noipv4ll
+	nodhcp

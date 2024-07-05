@@ -1,0 +1,12 @@
+---
+dependencies:
+  - vars:
+      foreman_dhcp_range:
+        - '{{ foreman_dhcp_range_start }}'
+        - '{{ foreman_dhcp_range_end }}'
+      foreman_dhcp_range_str: '{{ " ".join(foreman_dhcp_range) }}"'
+      configs:
+        - '/etc/foreman-installer/scenarios.d/foreman-answers.yaml'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

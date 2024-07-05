@@ -1,0 +1,10 @@
+---
+# TODO: reconfigure GRUB to use predictable nic names
+# maybe make use of /etc/default/grub.d or whatever it was?
+dependencies:
+  - vars:
+      configs:
+        - '/etc/default/grub'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

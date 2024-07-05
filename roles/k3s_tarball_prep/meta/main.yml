@@ -1,0 +1,10 @@
+---
+dependencies:
+  - vars:
+      tarball: '{{ k3s_tarball }}'
+      filename: '{{ k3s_binary | basename }}'
+      checksum: '{{ k3s_sha256_checksum }}'
+      url: '{{ k3s_url }}'
+    role: 'meta_download_compress'
+...
+# vim: set filetype=yaml:

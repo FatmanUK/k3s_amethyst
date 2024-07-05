@@ -1,0 +1,101 @@
+---
+has_iptables: yes
+has_nftables: no
+has_sysconfig: no
+has_systemd: yes
+has_runit: no
+has_xbps: no
+has_yum: no
+has_apt: yes
+has_dhcpcd: no
+
+systemd_uses_usrlib: no
+
+update_servers: [ ]
+
+mandatory_access_control: 'apparmor'
+
+console_resolution: '896x504'
+
+grub_linux_command_args:
+  - 'nofb'
+  - 'nomodeset'
+  - 'loglevel=4'
+  - 'VGA={{ console_resolution }}'
+  - 'net.ifnames=0'
+  - 'apparmor=1'
+  - 'security=apparmor'
+  - 'keymap=uk'
+  - 'drm.debug=0x1e'
+  - 'vt.default_red=0xee,0xdc,0x85,0xb5,0x26,0xd3,0x2a,0x07,0xfd,0xcb,0x93,0x83,0x65,0x6c,0x58,0x00'
+  - 'vt.default_grn=0xe8,0x32,0x99,0x89,0x8b,0x36,0xa1,0x36,0xf6,0x4b,0xa1,0x94,0x7b,0x71,0x6e,0x2b'
+  - 'vt.default_blu=0xd5,0x2f,0x00,0x00,0xd2,0x82,0x98,0x42,0xe3,0x16,0xa1,0x96,0x83,0xc4,0x75,0x36'
+grub_enable_blscfg: no
+
+# install libosinfo-bin and osinfo-db
+# osinfo-query os | grep ...
+libosinfo_base_url: 'http://ubuntu.com/ubuntu'
+os_version: '20.04'
+
+package_manager: 'apt'
+packages_on_disc: no
+packages:
+  selinux: [ ]
+    #- 'libselinux1'
+    #- 'libsemanage-common'
+    #- 'libsemanage1'
+    #- 'libsepol1'
+    #- 'policycoreutils'
+    #- 'restorecond'
+    #- 'selinux-basics'
+    #- 'selinux-policy-default'
+    #- 'selinux-utils'
+    #- 'semanage-utils'
+  apparmor:
+    - 'apparmor'
+    - 'libapparmor1'
+    - 'apparmor-easyprof'
+    - 'apparmor-profiles'
+    - 'apparmor-profiles-extra'
+    - 'apparmor-utils'
+  logrotate:
+    - 'logrotate'
+  rsyslog:
+    - 'rsyslog'
+    - 'rsyslog-elasticsearch'
+  iptables:
+    - 'iptables'
+    - 'netscript-ipfilter'
+  chrony:
+    - 'chrony'
+
+standard_logs:
+  - '/var/log/messages'
+  - '/var/log/secure'
+  - '/var/log/kdump.log'
+  - '/var/log/maillog'
+  - '/var/log/cron'
+  - '/var/log/spooler'
+
+# TODO: add more
+unneeded_services:
+  - 'k3s'
+
+unneeded_paths:
+  - '/etc/k3s-token'
+  - '/etc/k3s-token-file'
+  - '/etc/issue.new-0.140_8'
+  - '/etc/rc.conf.new-20210314_1'
+  - '/etc/cni/net.d'
+  - '/etc/myname'
+  - '/etc/rancher'
+  - '/etc/sudoers.new-1.9.5p2_2'
+  - '/usr/libexec/kubernetes'
+  - '/usr/lib/virt-sysprep'
+  - '/home/ansible/install_k3s.sh'
+  - '/home/ansible/k3s'
+  - '/var/lib/calico'
+  - '/var/lib/rancher'
+  - '/var/run/containerd'
+...
+# vim: set filetype=yaml:

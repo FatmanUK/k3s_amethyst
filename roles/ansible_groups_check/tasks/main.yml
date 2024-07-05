@@ -1,0 +1,10 @@
+---
+- name: 'Assert inventory in use'
+  connection: 'local'
+  run_once: yes
+  assert:
+    that:
+      - '(groups.all | length) > 1'
+    fail_msg: 'Please specify an inventory with "-i site/name".'
+...
+# vim: set filetype=yaml:

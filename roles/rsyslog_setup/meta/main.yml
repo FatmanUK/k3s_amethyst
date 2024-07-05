@@ -1,0 +1,25 @@
+---
+# TODO: do config properly
+dependencies:
+  - vars:
+      package_set: 'rsyslog'
+    role: 'meta_package_install'
+  - vars:
+      configs:
+        - '/etc/rsyslog.conf'
+    role: 'meta_rootfile_template'
+  - vars:
+      paths:
+        - '/etc/rsyslog.d'
+    role: 'meta_rootdir_create'
+  - vars:
+      uid: '514'
+      gid: '514'
+      username: '_log'
+      groupname: '_log'
+    role: 'meta_user_create'
+  - vars:
+      service: 'rsyslog'
+    role: 'meta_service_enable_and_stop'
+...
+# vim: set filetype=yaml:

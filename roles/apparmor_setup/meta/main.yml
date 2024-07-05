@@ -1,0 +1,7 @@
+---
+dependencies:
+  - vars:
+      package_set: 'apparmor'
+    role: 'meta_package_install'
+...
+# vim: set filetype=yaml:

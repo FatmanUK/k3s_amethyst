@@ -1,0 +1,8 @@
+---
+- name: 'Remove some filesystem paths'
+  loop: '{{ unneeded_paths }}'
+  file:
+    path: '{{ item }}'
+    state: 'absent'
+...
+# vim: set filetype=yaml:

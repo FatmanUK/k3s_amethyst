@@ -1,0 +1,9 @@
+weekly
+rotate 4
+create
+compress
+include /etc/logrotate.d
+{% for log in standard_logs %}
+{{ log }}
+{% endfor -%}
+{ }

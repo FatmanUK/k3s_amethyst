@@ -1,0 +1,17 @@
+---
+# $ cd /boot
+# $ sudo ln -s grub grub2
+
+# grub editor might interfere with netplan?
+# comment I left but I don't recall what it means
+
+- name: 'Regenerate GRUB'
+  become: yes
+  vars:
+    cmd:
+      - 'scripts/grub_update.bash'
+  args:
+    executable: '/bin/bash'
+  script: '{{ cmd | join(" ") }}'
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,6 @@
+---
+- name: 'noop'
+  debug:
+    msg: 'Do nothing'
+...
+# vim: set filetype=yaml:

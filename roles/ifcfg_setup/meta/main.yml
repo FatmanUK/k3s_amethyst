@@ -1,0 +1,10 @@
+---
+dependencies:
+  - vars:
+      configs:
+        - '/etc/sysconfig/network'
+        - '/etc/sysconfig/network-scripts/ifcfg-eth0'
+        - '/etc/resolv.conf'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

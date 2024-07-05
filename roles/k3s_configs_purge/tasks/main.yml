@@ -1,0 +1,9 @@
+---
+- name: 'Remove existing configuration'
+  when: 'is_clobbering_time'
+  loop: '{{ k3s_clobber_files_common + k3s_clobber_files_distro }}'
+  file:
+    path: '{{ item }}'
+    state: 'absent'
+...
+# vim: set filetype=yaml:

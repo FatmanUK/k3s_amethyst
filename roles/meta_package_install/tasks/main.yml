@@ -1,0 +1,163 @@
+---
+# Usage:
+#dependencies:
+#  - vars:
+#      package_set: 'selinux'
+#    role: 'meta_package_install'
+# package_set is defined in the os_* groups.
+
+# Currently doesn't work on apt-having distros, see below.
+
+- name: 'Installing packages'
+  run_once: yes
+  debug:
+    var: 'package_set'
+
+# maybe use this?
+# maybe make this a meta role? no --- not a one-shot deal with no leftovers.
+#- name: 'Mount local repo image'
+#  register: 'reg_mount'
+#  changed_when:
+#    - 'reg_mount.rc != 0'
+#    - 'e_mount_already_already not in reg_mount.stderr'
+#    - 'e_mount_no_media not in reg_mount.stderr'
+#  failed_when:
+#    - 'reg_mount.rc != 0'
+#    - 'e_mount_notfound_fstab in reg_mount.stderr'
+#    - 'e_mount_no_media not in reg_mount.stderr'
+#  vars:
+#    cmd:
+#      - 'scripts/dev_mount.bash'
+#      - '{{ fstab_mount | quote }}'
+#  args:
+#    executable: '/bin/bash'
+#  script: '{{ cmd | join(" ") }}'
+
+# This one has a variety of ways to fail, and it's not even using command
+# module. :/ TODO: Possibly replace with script?
+- name: 'Create local repo mountpoint'
+  register: 'reg_mkdir'
+  when:
+    - 'libvirtd_version is version("9.0", ">")'
+  vars:
+  failed_when:
+    - 'reg_mkdir.rc is defined'
+    - 'reg_mkdir.module_stdout is defined'
+    - 'reg_mkdir.rc != 0'
+    - 'e_mkdir_readonly not in reg_mkdir.module_stdout'
+    - 'e_mkdir_readonly not in reg_mkdir.module_stderr'
+    - 'e_mkdir_exists not in reg_mkdir.module_stdout'
+    - 'e_mkdir_exists not in reg_mkdir.module_stderr'
+  file:
+    path: '/mnt/disc'
+    state: 'directory'
+    mode: '0000'
+
+# Upstream libvirt bug means we might not be able to use the ISO functionality.
+# https://bugzilla.redhat.com/show_bug.cgi?id=2166411
+# https://access.redhat.com/errata/RHBA-2023:2171
+# Fixed in libvirtd v9.0.0+.
+
+- name: 'Set up package disc'
+  when:
+    - 'packages_on_disc'
+    - 'libvirtd_version is version("9.0", ">")'
+  block:
+    # To remove, attach "" as image name
+    - name: 'Insert disc ISO in VM'
+      connection: 'local'
+      become: no
+      environment:
+        LIBVIRT_DEFAULT_URI: 'qemu:///session'
+      command:
+        argv:
+          - 'virsh'
+          - 'attach-disk'
+          - '{{ fqdn }}'
+          - '{{ packages_disc }}'
+          - 'sda'
+          - '--driver'
+          - 'qemu'
+          - '--type'
+          - 'cdrom'
+          - '--mode'
+          - 'readonly'
+
+    - name: 'Mount disc'
+      register: 'reg_mount'
+      vars:
+        e_already_mounted: '/dev/sr0 already mounted on /mnt/disc'
+        e_not_exist: 'special device /dev/sr0 does not exist'
+        e_no_medium: 'no medium found on /dev/sr0'
+      # we don't like e_not_exist and e_no_medium,
+      # but we can try to carry on
+      changed_when:
+        - 'reg_mount.rc == 0'
+        - 'e_already_mounted not in reg_mount.stderr'
+        - 'e_not_exist not in reg_mount.stderr'
+        - 'e_no_medium not in reg_mount.stderr'
+      # we don't like e_not_exist and e_no_medium,
+      # but we can try to carry on
+      failed_when:
+        - 'reg_mount.rc != 0'
+        - 'e_already_mounted not in reg_mount.stderr'
+        - 'e_not_exist not in reg_mount.stderr'
+        - 'e_no_medium not in reg_mount.stderr'
+      command:
+        argv:
+          - 'mount'
+          - '/dev/sr0'
+          - '/mnt/disc'
+
+- name: 'Disable media if libvirt version low'
+  when:
+    - 'libvirtd_version is version("9.0", "<=")'
+    - 'has_yum'
+  replace:
+    path: '/etc/yum.repos.d/rhel.repo'
+    regexp: '^enabled=1$'
+    replace: 'enabled=0'
+
+- name: 'Install packages'
+  when:
+    # TODO: fix this properly!
+    # This is a poor workaround for the 'python3-apt must be installed and visible from /usr/bin/python3' bug
+    - 'not has_apt'
+  package:
+    use: '{{ package_manager }}'
+    update_cache: true  # not doc'd, but stackoverflow says it works
+    name: '{{ packages[package_set] }}'
+
+- name: 'Remove package disc'
+  when:
+    - 'packages_on_disc'
+    - 'libvirtd_version is version("9.0", ">")'
+  block:
+    - name: 'Unmount disc'
+      command:
+        argv:
+          - 'umount'
+          - '/mnt/disc'
+
+    # To remove, attach "" as image name
+    - name: 'Remove disc ISO from VM'
+      connection: 'local'
+      run_once: yes
+      become: no
+      environment:
+        LIBVIRT_DEFAULT_URI: 'qemu:///session'
+      command:
+        argv:
+          - 'virsh'
+          - 'attach-disk'
+          - '{{ vm_name }}'
+          - ''
+          - 'sda'
+          - '--driver'
+          - 'qemu'
+          - '--type'
+          - 'cdrom'
+          - '--mode'
+          - 'readonly'
+...
+# vim: set filetype=yaml:

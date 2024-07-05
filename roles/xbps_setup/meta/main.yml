@@ -1,0 +1,9 @@
+---
+# Not updating xbps here --- do that at update time.
+dependencies:
+  - vars:
+      configs:
+        - '/etc/xbps.d/00-repository-main.conf'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

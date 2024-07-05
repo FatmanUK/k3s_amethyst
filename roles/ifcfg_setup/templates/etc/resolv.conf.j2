@@ -1,0 +1,6 @@
+# {{ ansible_managed }}
+search {{ domain }}
+nameserver {{ network_gateway }}
+{% for NS in extra_name_servers.split(' ') -%}
+nameserver {{ NS }}
+{% endfor -%}

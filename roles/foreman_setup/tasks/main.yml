@@ -1,0 +1,129 @@
+---
+# Set up Foreman on its own Ubuntu VM.
+# This has to complete in one go, otherwise you need to roll back the
+# VM and start again. I've seen the foreman-install process take
+# anything between 8 and 20 minutes.
+# Don't try to install it on a non-systemd host.
+
+# Enable debug logs:
+# foreman-installer --foreman-logging-level "debug" --foreman-proxy-log-level "DEBUG"
+# Logs are in /var/log/foreman-proxy/proxy.log and /var/log/foreman/production.log
+
+# https://thenewstack.io/automate-k3s-cluster-installation-on-flatcar-container-linux/
+
+# current issues:
+# .foreman_url connection refused
+# .no boot.msg display
+# .systemd does not like "&amp;&amp;"
+# .ign file as template not found, as snippet found empty
+
+#- name: Gather Distribution Ansible Facts within role
+#  setup:
+#    gather_subset:
+#      - distribution
+#  tags:
+#    - yum_repos
+#
+#^^ interesting.
+
+# Possible Foreman alts:
+# . ~~opentofu/Terraform~~ (nope, rubbed me the wrong way with its serverlessness and no hint of pxeness)
+# . https://github.com/cobbler/cobbler (established)
+# . https://maas.io/how-it-works
+# . https://github.com/openstack/ironic
+# . https://matchbox.psdn.io/
+# . https://github.com/mr-provisioner/mr-provisioner
+# . https://tinkerbell.org/ (While "Tinkerbell" sounds incredibly twee, it is at least 3yo and I have a recommendation for it.)
+
+- name: 'Set hostname properly'
+  copy:
+    content: '{{ fqdn }}'
+    dest: '/etc/hostname'
+
+- name: 'Set hostname properly'
+  command:
+    argv:
+      - 'hostname'
+      - '{{ fqdn }}'
+
+# needs US locale
+- name: 'Add locales to locale.gen'
+  loop:
+    - 'en_GB.UTF-8 UTF-8'
+    - 'en_US.UTF-8 UTF-8'
+  lineinfile:
+    line: '{{ item }}'
+    path: '/etc/locale.gen'
+
+# It's possible these next two do the exact same thing.
+# It's hard to tell.
+- name: 'Generate locales'
+  command:
+    argv:
+      - 'locale-gen'
+#      - '{{ foreman_db_locale | quote }}'
+
+- name: 'Reconfigure locales'
+  command:
+    argv:
+      - 'dpkg-reconfigure'
+      - '-f'
+      - 'noninteractive'
+      - 'locales'
+
+- name: 'Download Puppet release config'
+  get_url:
+    url: 'https://apt.puppet.com/{{ foreman_puppet_deb }}'
+    dest: '/tmp/{{ foreman_puppet_deb }}'
+
+- name: 'Install Puppet conf'
+  command:
+    argv:
+      - 'apt-get'
+      - 'install'
+      - '/tmp/{{ foreman_puppet_deb }}'
+
+- name: 'Install Foreman installer public GPG key'
+  get_url:
+    url: 'https://deb.theforeman.org/foreman.asc'
+    dest: '/etc/apt/trusted.gpg.d/foreman.asc'
+
+- name: 'Set hostname properly'
+  copy:
+    content: |
+      deb http://deb.theforeman.org/ focal 3.11
+      deb http://deb.theforeman.org/ plugins 3.11
+    dest: '/etc/apt/sources.list.d/foreman.list'
+
+- name: 'Update package cache'
+  command:
+    argv:
+      - 'apt-get'
+      - 'update'
+
+# TODO: use meta_package_install here?
+- name: 'Install packages'
+  loop: '{{ foreman_packages }}'
+  apt:
+    name: '{{ item }}'
+    update_cache: yes
+
+# - '--foreman-proxy-oauth-consumer-key=H2Sj46zBsv12345unvU6idEsjjmTd6Uu'
+# - '--foreman-proxy-oauth-consumer-secret=98SNp2faDLwp123456PDFwwufnqHSHxd'
+
+- name: 'Install Foreman'
+  register: 'reg_foreman'
+  command:
+    argv:
+      - 'foreman-installer'
+
+- name: 'Output Foreman information'
+  debug:
+    msg: '{{ reg_foreman.stdout }}'
+
+#  Success!
+#  * Foreman is running at https://foreman-1.dreamtrack.test
+#      Initial credentials are admin / LJF5C8cEWLY62mzS
+#  * Foreman Proxy is running at https://foreman-1.dreamtrack.test:8443
+...
+# vim: set filetype=yaml:

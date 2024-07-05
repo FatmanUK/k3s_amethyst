@@ -1,0 +1,69 @@
+---
+# per k3s instructions
+- name: 'Add rshared option to root partition'
+  vars:
+    replace_internal: '\2,rshared'
+    regex_negative_lookahead: 'rshared'
+    regex_prefix: '([^ ]* \/ [^ ]* )'
+    regex_suffix: '( \d \d)'
+  replace:
+    path: '/etc/fstab'
+    regexp: '^{{ regex_prefix }}((:?(?!{{ regex_negative_lookahead }}).)*?){{ regex_suffix }}$'
+    replace: '\1{{ replace_internal }}\4'
+
+# TODO: would a symlink do/be better?
+- name: 'Copy hostname to nodename'
+  copy:
+    remote_src: yes
+    src: '/etc/hostname'
+    dest: '{{ calico_dir }}/nodename'
+
+# The k3s project has taken the unusual decision to host built
+# binaries without any wrapper or compression at all. You just
+# download the actual binary and away you go. This is possible
+# since Go binaries famously have no dependencies.
+
+# This made me feel slimy and naked so I wrapped it up in a
+# tarball. It didn't even have a version number attached.
+
+- name: 'Unarchive the k3s binary'
+  unarchive:
+    src: '{{ k3s_tarball }}'
+    dest: '{{ k3s_binary_dir }}/'
+
+- name: 'Permission the binary'
+  file:
+    path: '{{ k3s_binary_dir }}/k3s'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+- name: 'Create symlinks'
+  loop: '{{ k3s_symlinks }}'
+  file:
+    src: '{{ k3s_binary_dir }}/k3s'
+    dest: '{{ k3s_binary_dir }}/{{ item }}'
+    state: 'link'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+# sudo ln -s /usr/local/bin/crictl /usr/bin/
+
+# can't meta this, needs 0755 permissions
+- name: 'Create scripts'
+  loop: '{{ k3s_scripts }}'
+  template:
+    src: '{{ item[1:] }}'
+    dest: '{{ item }}'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+
+- name: 'Generate bash completions'
+  args:
+    # creates: '/etc/profile.d/bbsh_completion_kubectl.sh'
+    executable: '/bin/bash'
+  script: 'scripts/generate_kubectl_bash_completion.bash'
+...
+# vim: set filetype=yaml:

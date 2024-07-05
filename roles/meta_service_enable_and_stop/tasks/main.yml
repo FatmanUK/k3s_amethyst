@@ -1,0 +1,70 @@
+---
+- name: 'Output service name'
+  run_once: yes
+  debug:
+    msg: 'Enabling service: {{ service }}'
+
+# can't use metas here, also don't like to meta metas
+- name: 'Create service tree'
+  when:
+    - 'has_runit'
+  file:
+    path: '/etc/sv/{{ service }}/log'
+    state: 'directory'
+
+#- name: 'debug'
+#  loop: '{{ service_files }}'
+#  vars:
+#    f_content: '{{ lookup("file", item.file, errors="ignore") }}'
+#    f_exists: '{{ f_content != "" }}'
+#  debug:
+#    var: 'f_exists'
+
+- name: 'Template in service files'
+  # most services will install their own service files
+  when:
+    - 'f_exists'
+  loop: '{{ service_files }}'
+  vars:
+    f_path: '{{ playbook_dir }}/service/{{ item.file[1:] }}.j2'
+    f_content: '{{ lookup("file", f_path, errors="ignore") }}'
+    f_exists: '{{ f_content != "" }}'
+  template:
+    src: '{{ f_path }}'
+    dest: '{{ item.file }}'
+    mode: '{{ item.mode }}'
+
+- name: 'Template in log script'
+  when:
+    - 'has_runit'
+  template:
+    src: 'log.j2'
+    dest: '/etc/sv/{{ service }}/log/run'
+    mode: '0755'
+
+- name: 'Enable and stop systemd service'
+  when:
+    - 'has_systemd'
+  failed_when: no
+  systemd:
+    name: '{{ service }}'
+    enabled: yes
+    state: 'stopped'
+    daemon_reload: yes
+
+- name: 'Block runit service'
+  when:
+    - 'has_runit'
+  file:
+    dest: '/etc/sv/{{ service }}/down'
+    state: 'touch'
+
+- name: 'Enable runit service'
+  when:
+    - 'has_runit'
+  file:
+    src: '/etc/sv/{{ service }}'
+    dest: '/var/service/{{ service }}'
+    state: 'link'
+...
+# vim: set filetype=yaml:

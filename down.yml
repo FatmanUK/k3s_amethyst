@@ -1,0 +1,6 @@
+---
+- name: 'Checks'
+  import_playbook: 'checks.yml'
+
+...
+# vim: set filetype=yaml:

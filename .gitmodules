@@ -1,0 +1,3 @@
+[submodule "plugins/modules"]
+	path = plugins/modules
+	url = https://github.com/FatmanUK/ansible_modules.git

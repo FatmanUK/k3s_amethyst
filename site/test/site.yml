@@ -1,0 +1,63 @@
+---
+all:
+  vars:
+    vm_disk_location: '/home/fatman/libvirt/images'
+    vm_net_bridge_name: 'virbr0'
+    subnet: '10.11.0.0/24'
+    domain: 'dreamtrack.test'
+    gateway_host_id: '254'
+
+os_rhel:
+  hosts: { }
+
+os_voidlinux:
+  hosts:
+    # is home laptop
+    build-01:
+      host_id: '254'
+    k3s-mother-01:
+      host_id: '1'
+    #k3s-mother-02:  # possibly not keeping this
+    #  host_id: '2'
+    k3s-mother-03:  # possibly not keeping this
+      host_id: '3'
+    #k3s-child-01:
+    #  host_id: '11'
+    #k3s-child-02:
+    #  host_id: '12'
+    k3s-child-03:
+      host_id: '13'
+
+os_ubuntu:
+  hosts:
+    # Foreman needs its own environment. Stick it in an Ubuntu VM.
+    # is xenial-playground
+    foreman-01:
+      host_id: '123'
+      vm_mac: '52:54:00:fb:90:27'
+
+builder:
+  hosts:
+    build-01:
+
+foreman:
+  hosts:
+    foreman-01:
+  vars:
+    foreman_dhcp_range_start_id: '175'
+    foreman_dhcp_range_end_id: '195'
+    foreman_reverse_zone: '{{ subnet | reverse_zone }}'
+
+primaries:
+  hosts:
+    k3s-mother-01:
+
+secondaries:
+  hosts:
+    k3s-mother-03:
+
+agents:
+  hosts:
+    k3s-child-03:
+...
+# vim: set filetype=yaml:
