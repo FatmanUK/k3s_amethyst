@@ -1,0 +1,18 @@
+---
+- name: 'Reinstate networking'
+  when:
+    - 'has_systemd'
+  block:
+    - name: 'Configure systemd'
+      loop: '{{ reinstate_steps }}'
+      command:
+        argv: '{{ reinstate_cmd + item }}'
+
+    - name: 'Uninstall dross'
+      command:
+        argv:
+          - 'apt-get'
+          - 'purge'
+          - 'netplan.io'
+...
+# vim: set filetype=yaml:

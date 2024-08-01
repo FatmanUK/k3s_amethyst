@@ -1,7 +1,7 @@
 ---
 # Note, at work site there is an iptables issue.
 # Needs iptables -I INPUT 1 -ptcp --dport 5000 -j ACCEPT
-# TODO #18: check if iptables blocks the pull-through cache and if so add a rule (eg. iptables -I INPUT 1 -ptcp --dport 5000 -j ACCEPT -m comment comment "Docker registry for Kubernetes clusters")
+# TODO #18: check if iptables blocks the pull-through cache and if so add a rule (eg. iptables -I INPUT 1 -ptcp --dport 5000 -j ACCEPT -m comment comment "pull-through cache for docker.io")
 dependencies:
   - vars:
       configs:

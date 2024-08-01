@@ -9,7 +9,7 @@
 # foreman-installer --foreman-logging-level "debug" --foreman-proxy-log-level "DEBUG"
 # Logs are in /var/log/foreman-proxy/proxy.log and /var/log/foreman/production.log
 
-# https://thenewstack.io/automate-k3s-cluster-installation-on-flatcar-container-linux/
+# https://t.ly/_NQ1p
 
 # current issues:
 # .foreman_url connection refused
@@ -28,12 +28,16 @@
 
 # Possible Foreman alts:
 # . ~~opentofu/Terraform~~ (nope, rubbed me the wrong way with its serverlessness and no hint of pxeness)
-# . https://github.com/cobbler/cobbler (established)
-# . https://maas.io/how-it-works
-# . https://github.com/openstack/ironic
-# . https://matchbox.psdn.io/
-# . https://github.com/mr-provisioner/mr-provisioner
-# . https://tinkerbell.org/ (While "Tinkerbell" sounds incredibly twee, it is at least 3yo and I have a recommendation for it.)
+# . https://t.ly/eHVZL (established)
+# . https://t.ly/X1s2s
+# . https://t.ly/nHTha
+# . https://t.ly/R3g-h
+# . https://t.ly/qVsSb
+# . https://t.ly/bA3su (While "Tinkerbell" sounds incredibly twee, it is at least 3yo and I have a recommendation for it.)
+
+# wget 
+#     /releases/download/v0.9.0/ct-v0.9.0-x86_64-unknown-linux-gnu
+# install ct-v0.9.0-x86_64-unknown-linux-gnu /usr/bin/ct -m0755
 
 - name: 'Set hostname properly'
   copy:

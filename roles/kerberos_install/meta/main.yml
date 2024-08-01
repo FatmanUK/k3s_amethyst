@@ -1,0 +1,12 @@
+---
+dependencies:
+  - vars:
+      repo_name: ''
+      repo_url: ''
+      chart_name: 'kerberos'
+      chart_version: '{{ kerberos_version }}'
+      chart_namespace: '{{ kerberos_namespace }}'
+      chart_install_timeout: '{{ kerberos_install_timeout }}'
+    role: 'meta_helm_chart_install'
+...
+# vim: set filetype=yaml:

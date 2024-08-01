@@ -1,0 +1,16 @@
+---
+- name: 'Reboot'
+#  reboot:
+#    post_reboot_delay: 10
+  command:
+    argv:
+      - 'reboot'
+
+- name: 'Wait for host'
+  wait_for:
+    port: 22
+    delay: 5
+
+# test : Reboot command failed. Error was: 'invalid time, Warning: Permanently added '10.11.0.1' (ECDSA) to the list of known hosts.\r\nConnection to 10.11.0.1 closed.'
+...
+# vim: set filetype=yaml:

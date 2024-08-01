@@ -1,0 +1,52 @@
+---
+# kubectl apply -f ./ippools.yml
+# ippools.yml:
+#---
+#apiVersion: metallb.io/v1beta1
+#kind: IPAddressPool
+#metadata:
+#  name: metallb-pool-1
+#  namespace: metallb-system
+#spec:
+#  addresses:
+#    - 10.11.0.201-10.11.0.220
+#---
+#apiVersion: metallb.io/v1beta1
+#kind: L2Advertisement
+#metadata:
+#  name: empty
+#  namespace: metallb-system
+#...
+
+#- name: 'Create IP pool'
+#  vars:
+#    spec: |
+#      ---
+#      apiVersion: metallb.io/v1beta1
+#      kind: IPAddressPool
+#      metadata:
+#        name: metallb-pool-2
+#        namespace: {{ metallb_namespace }}
+#      spec:
+#        addresses:
+#          - 10.11.0.201-10.11.0.220
+#      ---
+#      apiVersion: metallb.io/v1beta1
+#      kind: L2Advertisement
+#      metadata:
+#        name: empty
+#        namespace: {{ metallb_namespace }}
+#      ...
+#  args:
+#    stdin: '{{ spec }}'
+#  command:
+#    argv:
+#      - '/usr/local/bin/kubectl'
+#      - 'create'
+#      - '-n'
+#      - '{{ metallb_namespace }}'
+#      - '-f'
+#      - '-'
+##      - '{{ spec | quote }}'
+...
+# vim: set filetype=yaml:

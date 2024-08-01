@@ -1,0 +1,69 @@
+---
+- name: 'Ensure directory exists'
+  file:
+    path: '{{ helm_tarball | dirname }}'
+    state: 'directory'
+
+# similar to meta_download_compress. TODO: Meta this as meta_download?
+#- name: 'Check if tarball exists already'
+#  register: 'reg_tarball'
+#  connection: 'local'
+#  run_once: yes
+#  become: no
+#  stat:
+#    path: '{{ helm_tarball }}'
+
+- name: 'Get checksum from tarball'
+#  when:
+#    - 'reg_tarball.stat.exists'
+  register: 'reg_checksum'
+  connection: 'local'
+  run_once: yes
+  become: no
+  stat:
+    path: '{{ helm_tarball }}'
+    checksum_algorithm: 'sha256'
+
+- debug:
+    var: 'reg_checksum'
+
+- name: 'Download specified tarballs'
+  register: 'reg_download'
+  when: 'not reg_checksum.stat.exists
+         or reg_checksum.stat.checksum != helm_sha256_checksum'
+  connection: 'local'
+  run_once: yes
+  become: no
+  retries: 5
+  delay: 5
+  until: 'reg_download is success'
+  get_url:
+    url: '{{ helm_url }}'
+    dest: '{{ helm_tarball }}'
+    checksum: 'sha256:{{ helm_sha256_checksum }}'
+    use_proxy: no
+
+# doesn't work :|
+#- name: 'Extract helm binary'
+#  unarchive:
+#    src: '{{ helm_tarball }}'
+#    dest: '/usr/local/bin/'
+#    extra_opts: '-C linux-amd64 helm'
+
+- name: 'Copy tarball to hosts'
+  copy:
+    src: '{{ helm_tarball }}'
+    dest: '/dev/shm/'
+
+- name: 'Extract file to path'
+  command:
+    argv:
+      - 'tar'
+      - 'xvpzf'
+      - '/dev/shm/{{ helm_tarball | basename }}'
+      - '{{ helm_os }}-{{ helm_arch }}/helm'
+      - '--strip-components=1'
+      - '--one-top-level={{ k3s_binary_dir }}'
+      - '--no-same-owner'
+...
+# vim: set filetype=yaml:

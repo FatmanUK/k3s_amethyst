@@ -18,6 +18,11 @@ k3s_arch: 'amd64'
 k3s_sha256_checksum: '2e90c4e696899ef37be871ec04986edac5ecf145da3e70e772e6c61f10b5400c'
 k3s_image_list_sha256_checksum: '114d34767bfee10ebb892ffa3448bcda2d46b234746c7bb8a0655419be3afec3'
 
+helm_version: 'v3.15.3'
+helm_os: 'linux'
+helm_arch: 'amd64'
+helm_sha256_checksum: 'ad871aecb0c9fd96aa6702f6b79e87556c8998c2e714a4959bf71ee31282ac9c'
+
 # k3s and k3s-images.txt both have sha256 hashes at k3s_sha256_checksum_url
 k3s_base_url: 'https://github.com/k3s-io/k3s/releases/download'
 k3s_dl_url: '{{ k3s_base_url }}/{{ k3s_version }}'
@@ -25,9 +30,23 @@ k3s_url: '{{ k3s_dl_url }}/k3s'
 #k3s_sha256_checksum_url: '{{ k3s_dl_url }}/sha256sum-{{ k3s_arch }}.txt'
 k3s_image_list_url: '{{ k3s_dl_url }}/k3s-images.txt'
 
+helm_url: 'https://get.helm.sh/helm-{{ helm_version }}-{{ helm_os }}-{{ helm_arch }}.tar.gz'
+
 k3s_tarball: '{{ playbook_dir }}/blobs/k3s-{{ k3s_version }}.tgz'
+
+helm_tarball: '{{ playbook_dir }}/blobs/helm-{{ helm_version }}-{{ helm_os }}-{{ helm_arch }}.tar.gz'
 
 k3s_binary_dir: '/usr/local/bin'
 k3s_binary: '{{ k3s_binary_dir }}/k3s'
+
+helm_filename: 'helm'
+
+mirrors:
+  - name: 'docker.io'
+    port: '5000'
+  - name: 'quay.io'
+    port: '5001'
+  - name: 'registry.k8s.io'
+    port: '5002'
 ...
 # vim: set filetype=yaml:

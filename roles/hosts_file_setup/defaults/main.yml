@@ -15,5 +15,9 @@ host_docker:
   - ip: '0.0.0.0'
     domain: 'docker.io'
     hostname: 'registry-1'
+  - ip: '0.0.0.0'
+    domain: 'registry.k8s.io'
+  - ip: '0.0.0.0'
+    domain: 'quay.io'
 ...
 # vim: set filetype=yaml:

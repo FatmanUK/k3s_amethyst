@@ -54,8 +54,8 @@
     mode: '0000'
 
 # Upstream libvirt bug means we might not be able to use the ISO functionality.
-# https://bugzilla.redhat.com/show_bug.cgi?id=2166411
-# https://access.redhat.com/errata/RHBA-2023:2171
+# https://t.ly/XH4xE
+# https://t.ly/8Jzmt
 # Fixed in libvirtd v9.0.0+.
 
 - name: 'Set up package disc'

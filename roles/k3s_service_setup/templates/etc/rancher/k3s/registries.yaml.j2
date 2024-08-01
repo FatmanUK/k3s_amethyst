@@ -1,5 +1,7 @@
 # {{ ansible_managed }}
 mirrors:
-  docker.io:
+{% for M in mirrors -%}
+  {{ M.name }}:
     endpoint:
-      - "http://{{ network_gateway }}:5000"
+      - "http://{{ network_gateway }}:{{ M.port }}"
+{% endfor -%}

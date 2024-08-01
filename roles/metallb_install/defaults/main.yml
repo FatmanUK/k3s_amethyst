@@ -1,0 +1,4 @@
+---
+metallb_namespace: 'metallb-system'
+...
+# vim: set filetype=yaml:

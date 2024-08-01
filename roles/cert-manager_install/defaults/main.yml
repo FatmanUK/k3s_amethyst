@@ -1,0 +1,4 @@
+---
+cert_manager_namespace: 'cert-manager-system'
+...
+# vim: set filetype=yaml:

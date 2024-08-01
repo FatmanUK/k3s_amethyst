@@ -1,0 +1,4 @@
+---
+kerberos_namespace: 'kerberos-system'
+...
+# vim: set filetype=yaml:

@@ -1,0 +1,4 @@
+---
+openldap_namespace: 'openldap-system'
+...
+# vim: set filetype=yaml:

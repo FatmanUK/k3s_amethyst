@@ -68,6 +68,11 @@ packages:
     - 'netscript-ipfilter'
   chrony:
     - 'chrony'
+  helm: [ ]
+  ssh:
+    - 'openssh-server'
+  networking:
+    - 'ifupdown'
 
 standard_logs:
   - '/var/log/messages'
@@ -97,5 +102,52 @@ unneeded_paths:
   - '/var/lib/calico'
   - '/var/lib/rancher'
   - '/var/run/containerd'
+
+# These packages aren't needed on a headless server
+# "Minimal", my arse
+# apt-get purge {{ item }}
+# apt-mark manual \*  # reject autoremove suggestions
+# TODO: there's no use for this yet, add a role
+xubuntu_remove_package_globs:
+  - 'alsa*'
+  - 'cloud*'
+  - 'cups*'
+  - 'elementary*'
+  - 'fontconfig*'
+  - 'fonts*'
+  - 'foomatic*'
+  - 'hplip*'
+  - 'hunspell*'
+  - 'gnome*'
+  - 'gnupg*'
+  - 'gstreamer*'
+  - 'gtk*'
+  - 'language-pack-gnome*'
+  - 'libasound2*'
+  - 'libcairo*'
+  - 'libcups*'
+  - 'libgl*'
+  - 'libgtk*'
+  - 'libhtml*'
+  - 'libjavascript*'
+  - 'libpaps*'
+  - 'libpoppler*'
+  - 'libvorbis*'
+  - 'libwayland*'
+  - 'libxcb*'
+  - 'libxf*'
+  - 'libxinerama*'
+  - 'lightdm*'
+  - 'lpr'
+  - 'mate*'
+  - 'mesa*'
+  - 'nano'      # hate nano!
+  - 'paps'
+  - 'pinentry*'
+  - 'wpa*'
+  - 'x11*'
+  - 'xfce*'
+  - 'xserver*'
+  - 'xubuntu*'
 ...
 # vim: set filetype=yaml:

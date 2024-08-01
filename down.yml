@@ -2,5 +2,32 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
+- name: 'Stop all hosts'
+  hosts: 'all'
+  become: yes
+  run_once: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'stop'
+  tasks:
+    - name: 'Take etcd snapshot'
+      delegate_to: '{{ groups.primaries | first }}'
+      command:
+        argv:
+          - '/usr/local/bin/k3s'
+          - 'etcd-snapshot'
+          - 'save'
+
+    - name: 'Shut down virsh domains'
+      connection: 'local'
+      become: no
+      loop: '{{ groups.all | difference(groups.builder) }}'
+      command:
+        argv:
+          - 'virsh'
+          - 'shutdown'
+          - '{{ item }}.{{ domain }}'
 ...
 # vim: set filetype=yaml:

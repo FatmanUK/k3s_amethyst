@@ -1,0 +1,4 @@
+---
+postgresql_namespace: 'postgresql-system'
+...
+# vim: set filetype=yaml:

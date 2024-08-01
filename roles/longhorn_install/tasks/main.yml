@@ -1,0 +1,20 @@
+---
+# Needs long timeout. Consider not using --atomic? Or increase the timeout? First time took 18m to complete, so make the timeout 36m.
+
+# helm uninstall longhorn -n longhorn-system
+# kubectl delete namespace longhorn-system
+
+- name: 'Patch service'
+  vars:
+    patch: '{"spec":{"type":"LoadBalancer"}}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'patch'
+      - 'service/longhorn-frontend'
+      - '-n'
+      - '{{ longhorn_namespace }}'
+      - '-p'
+      - '{{ patch | quote }}'
+...
+# vim: set filetype=yaml:

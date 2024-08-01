@@ -2,5 +2,22 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
+- name: 'Start all hosts'
+  hosts: 'all'
+  connection: 'local'
+  run_once: yes
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'start'
+  tasks:
+    - loop: '{{ groups.all | difference(groups.builder) }}'
+      command:
+        argv:
+          - 'virsh'
+          - 'start'
+          - '{{ item }}.{{ domain }}'
 ...
 # vim: set filetype=yaml:

@@ -1,0 +1,27 @@
+---
+- name: 'Generate random token'
+  vars:
+    random_spec: '/dev/null chars=ascii_letters,digits length=64'
+    seed: '{{ fqdn ~ now().microsecond }}'
+    password: '{{ lookup("password", random_spec, seed=seed)
+                  | password_hash("sha256")
+                  | b64encode }}'
+    cmd: 'scripts/generate_k3s_random_token.bash'
+    args:
+      - '{{ password | quote }}'
+      - '{{ k3s_binary | quote }}'
+  args:
+    executable: '/bin/bash'
+  script: '{{ ([ cmd ] + args) | join(" ") }}'
+
+- name: 'Read token'
+  register: 'reg_token'
+  slurp:
+    path: '/var/lib/rancher/k3s/server/token'
+
+- name: 'Set token fact'
+  run_once: yes  # spreads the token to all hosts
+  set_fact:
+    server_token: '{{ reg_token.content | b64decode }}'
+...
+# vim: set filetype=yaml:

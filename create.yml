@@ -2,11 +2,9 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
-# useful to find empty files: $ find roles/ -size 35c
-
-# wget https://github.com/coreos/container-linux-config-transpiler
-#     /releases/download/v0.9.0/ct-v0.9.0-x86_64-unknown-linux-gnu
-# install ct-v0.9.0-x86_64-unknown-linux-gnu /usr/bin/ct -m0755
+# useful to find "empty" files: $ find roles/ -size 35c -type f
+# useful to find actually empty files: $ find roles/ -size 0 -type f
+# useful to find empty directories: $ find roles/ -empty -type d
 
 # TODO #12 make vm - disk_setup, virsh_setup ?
 # see roles/foreman_setup/templates/vmspec.xml.j2 (might be symlinks
@@ -31,16 +29,12 @@
     - role: 'apt_setup'
       when:
         - 'has_apt'
-    - role: 'rsyslog_setup'
-#      tags:
-#        - 'debugging'
+    - 'rsyslog_setup'
     - role: 'service_start'
       vars:
         services:
           - 'rsyslog'
-    - role: 'logrotate_setup'
-#      tags:
-#        - 'debugging'
+    - 'logrotate_setup'
     - 'openssh_server_setup'
     - role: 'selinux_setup'
       when:
@@ -84,8 +78,6 @@
 #      vars:
 #        services:
 #          - 'chronyd'
-#      tags:
-#        - 'debugging'
     #- 'do_nothing'
     #- 'fail_egregiously'
 
@@ -109,12 +101,12 @@
     - import_tasks: 'handlers/main.yml'
   tags:
     - 'builder'
-    - 'never'
+    - 'never'  # only run when setting up the build host initially
   roles:
     - 'k3s_tarball_prep'
     - 'images_pull'
 
-- name: 'Prepare nodes'
+- name: 'Continue node preparation'
   hosts: 'nodes'
   become: yes
   gather_facts: yes
@@ -122,23 +114,69 @@
     - import_tasks: 'handlers/main.yml'
   tags:
     - 'nodes'
+    - 'prepare_nodes'
   roles:
     - 'sysctl_setup'
     - 'swap_disable'
     - 'iscsi_setup'
-    - 'hosts_file_setup'
-    - 'k3s_service_setup'
     - role: 'service_start'
       vars:
         services:
           - 'iscsi'
           - 'iscsid'
+    - 'hosts_file_setup'
+
+- name: 'Install k3s'
+  hosts: 'nodes'
+  become: yes
+  gather_facts: yes
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'nodes'
+    - 'install_nodes'
+  roles:
+    - 'k3s_service_setup'
+    - role: 'k3s_generate_token'
+      when:
+        - 'is_primary'
+    - 'k3s_service_add_token'
+    - role: 'service_start'
+      vars:
+        services:
           - 'k3s'
+# TODO: fix reboot role
+#    - role: 'host_reboot'
+#      when:
+#        - 'is_primary'
     - 'k3s_service_configure'
-    - 'do_nothing'
+#    - role: 'host_reboot'
+#      when:
+#        - 'not is_primary'
+    - 'nodes_check'
+    # TODO: add firewall check here
     - 'calico_install'
+    - 'helm_install'
+    - 'metallb_install'
+    - 'ingress-nginx_install'
+    - 'longhorn_install'
 
 # TODO #14: continue k3s setup, metallb, etc. bootstrap and appinstall
+
+- name: 'Install apps'
+  hosts: 'primaries'
+  become: yes
+  gather_facts: yes
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'nodes'
+    - 'install_apps'
+  roles:
+    - 'cert-manager_install'
+#    - 'kerberos_install'
+    - 'openldap_install'
+    - 'postgresql_install'
 
 - name: 'Post-install auto-snapshot'
   hosts: 'foreman:nodes'
