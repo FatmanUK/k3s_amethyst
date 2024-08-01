@@ -1,0 +1,18 @@
+---
+dependencies:
+  - vars:
+      package_set: 'chrony'
+    role: 'meta_package_install'
+  - vars:
+      public_time_servers:
+        - 'pool.ntp.org'
+        - 'time.nist.gov'
+        - 'time.google.com'
+      configs:
+        - '/etc/chrony/chrony.conf'
+    role: 'meta_rootfile_template'
+  - vars:
+      service: 'chronyd'
+    role: 'meta_service_enable_and_stop'
+...
+# vim: set filetype=yaml:

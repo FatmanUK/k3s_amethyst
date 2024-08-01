@@ -1,0 +1,17 @@
+---
+- name: 'Apply calico manifests'
+  loop:
+    - 'calico.yaml'
+    - 'calicoctl.yaml'
+  args:
+    stdin: '{{ lookup("file",  relpath ~ item) }}'
+  vars:
+    relpath: '{{ playbook_dir }}/roles/calico_install/files/'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'apply'
+      - '-f'
+      - '-'
+...
+# vim: set filetype=yaml:

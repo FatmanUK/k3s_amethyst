@@ -1,0 +1,28 @@
+# {{ ansible_managed }}
+
+$ModLoad immark   # provides --MARK-- message capability
+$ModLoad imuxsock # provides support for local system logging (e.g. v
+$ModLoad imklog   # kernel logging (formerly provided by rklogd)
+
+$IncludeConfig /etc/rsyslog.d/
+
+$FileCreateMode 0640
+$FileOwner root
+$FileGroup _log
+
+:syslogtag, isequal, "kernel:"   /var/log/kernel
+ & stop
+
+*.*                             -/var/log/messages
+
+authpriv.*                       /var/log/secure
+
+mail.*                          -/var/log/maillog
+
+cron.*                          -/var/log/cron
+
+*.emerg                          .*
+
+local7.*                         /var/log/boot.log
+
+:syslogtag, isequal, "sensors:"  /var/log/sensors

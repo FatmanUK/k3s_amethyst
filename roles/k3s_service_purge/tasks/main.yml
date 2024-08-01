@@ -1,0 +1,39 @@
+---
+- name: 'Disable and stop k3s service'
+  when: 'has_systemd'
+  systemd:
+    enabled: no
+    state: 'stopped'
+    force: yes
+    name: 'k3s'
+
+- name: 'Disable and stop k3s service'
+  when: 'has_runit'
+  block:
+    - name: 'Prevent service start'
+      register: 'reg_prevent_start'
+      failed_when:
+        - 'reg_prevent_start is failed'
+        - 'e_touch_fail not in reg_prevent_start.msg'
+      file:
+        state: 'touch'
+        path: '/etc/sv/k3s/down'
+        owner: 'root'
+        group: 'root'
+        mode: '0444'
+
+    - name: 'Stop service'
+      file:
+        path: '/var/service/k3s'
+        state: 'absent'
+
+    - name: 'Wait a sec'
+      pause:
+        seconds: 3
+
+    - name: 'Uninstall service'
+      file:
+        path: '/etc/sv/k3s'
+        state: 'absent'
+...
+# vim: set filetype=yaml:

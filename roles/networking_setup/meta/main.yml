@@ -1,0 +1,9 @@
+---
+dependencies:
+  - vars:
+      configs:
+        - '/etc/network/interfaces.d/eth0'
+        - '/etc/hostname'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

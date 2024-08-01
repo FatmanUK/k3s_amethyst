@@ -1,0 +1,11 @@
+---
+# TODO: meta this away as well :)
+- name: 'Set cron job for logrotate'
+  cron_legacy:
+    name: 'Rotate logs at regular intervals'
+    cron_file: '/etc/crontab'
+    user: 'root'
+    job: '/usr/bin/logrotate /etc/logrotate.conf'
+    minute: '04'
+...
+# vim: set filetype=yaml:

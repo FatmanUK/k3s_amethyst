@@ -1,0 +1,36 @@
+---
+- name: 'Check which service file is in use'
+  register: 'reg_etc'
+  stat:
+    path: '/etc/systemd/system/sshd.service'
+
+- name: 'Adding keygen to sshd service'
+  register: 'reg_keygen'
+  when:
+    - 'has_systemd'
+  vars:
+    service_path: '{{ "/etc" if reg_etc.stat.exists else "/usr/lib" }}'
+  lineinfile:
+    line: 'ExecStartPre=/usr/bin/ssh-keygen -A'
+    insertbefore: 'ExecStartPre=/usr/sbin/sshd -t'
+    path: '{{ service_path }}/systemd/system/sshd.service'
+
+- name: 'Reload systemd configs'
+  when:
+    - 'has_systemd'
+    - 'reg_keygen is changed'
+  systemd_service:
+    daemon_reload: true
+
+# This script exists so that Ansible treats these operations as
+# atomic, ie. doesn't lose connection halfway through.
+- name: 'Renewing SSH keys'
+  vars:
+    cmd:
+      - 'scripts/ssh_renew.bash'
+      - '{{ "4 KB" | human_to_bytes | quote }}'
+  args:
+    executable: '/bin/bash'
+  script: '{{ cmd | join(" ") }}'
+...
+# vim: set filetype=yaml:

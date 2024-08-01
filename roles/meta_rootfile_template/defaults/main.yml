@@ -1,0 +1,6 @@
+---
+paths_string: '{% for item in configs %} {{ item | dirname }}{% endfor %}'
+
+dir_paths: '{{ paths_string[1:].split(" ") | list }}'
+...
+# vim: set filetype=yaml:

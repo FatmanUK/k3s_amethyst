@@ -1,0 +1,12 @@
+---
+dependencies:
+  - vars:
+      configs:
+        - '/etc/dhcpcd.conf'
+        - '/etc/dhcpcd.exit-hook'
+    role: 'meta_rootfile_template'
+  - vars:
+      service: 'dhcpcd'
+    role: 'meta_service_enable_and_stop'
+...
+# vim: set filetype=yaml:

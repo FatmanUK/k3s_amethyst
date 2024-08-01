@@ -1,0 +1,22 @@
+---
+- name: 'Create iscsi initiator name'
+  register: 'reg_iname'
+  vars:
+    cmd:
+      - 'scripts/iscsi_name.bash'
+  args:
+    executable: '/bin/bash'
+  script: '{{ cmd | join(" ") }}'
+
+# can't meta this, depends on previous task
+- name: 'Template out iscsi initiator name'
+  loop:
+    - '/etc/iscsi/initiatorname.iscsi'
+  template:
+    src: '{{ item[1:] }}.j2'
+    dest: '{{ item }}'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+...
+# vim: set filetype=yaml:

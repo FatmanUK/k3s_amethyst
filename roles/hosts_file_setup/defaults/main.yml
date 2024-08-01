@@ -1,0 +1,19 @@
+---
+host_defaults:
+  - ip: '127.0.0.1'
+    domain: 'localdomain'
+    hostname: 'localhost'
+  - ip: '::1'
+    domain: 'localdomain'
+    hostname: 'localhost'
+  - ip: '::1'
+    domain: 'ip6-localhost'
+
+host_docker:
+  - ip: '0.0.0.0'
+    domain: 'docker.io'
+  - ip: '0.0.0.0'
+    domain: 'docker.io'
+    hostname: 'registry-1'
+...
+# vim: set filetype=yaml:

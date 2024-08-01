@@ -1,0 +1,22 @@
+---
+- name: 'Delete services (runit)'
+  when:
+    - 'has_runit'
+  loop: '{{ unneeded_services }}'
+  file:
+    path: '/var/service/{{ item }}'
+    state: 'absent'
+
+- name: 'Delete services (systemd)'
+  when:
+    - 'has_systemd'
+  vars:
+    paths:
+      - '/etc/systemd/system'
+      - '/usr/lib/systemd/system'
+  loop: '{{ paths | product(unneeded_services) }}'
+  file:
+    path: '{{ item | join("/") }}.service'
+    state: 'absent'
+...
+# vim: set filetype=yaml:

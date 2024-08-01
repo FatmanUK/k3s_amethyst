@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+{% for public_time_server in public_time_servers %}
+pool {{ public_time_server }} iburst
+{% endfor %}
+
+maxupdateskew 100
+driftfile /var/lib/chrony/drift
+makestep 1.0 3
+bindcmdaddress 127.0.0.1
+
+rtcsync

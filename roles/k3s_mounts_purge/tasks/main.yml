@@ -1,0 +1,19 @@
+---
+# Do not reboot to unmount. Find another way.
+# Maybe a lazy unmount?
+
+- name: 'Unmount kubelet and nfs'
+  register: 'reg_unmount'
+  become: yes
+  failed_when:
+    - 'reg_unmount.rc != 0'
+    - 'e_mount_notfound_none not in reg_unmount.stderr'
+    - 'e_mount_already_not not in reg_unmount.stderr'
+  loop: '{{ unmount_points + extra_unmount_points }}'
+  command:
+    argv:
+      - '/usr/bin/umount'
+      - '-l'
+      - '{{ item }}'
+...
+# vim: set filetype=yaml:

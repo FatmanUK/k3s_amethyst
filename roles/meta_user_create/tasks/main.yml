@@ -1,0 +1,13 @@
+---
+- name: 'Create group'
+  group:
+    name: '{{ groupname }}'
+    gid: '{{ gid }}'
+
+- name: 'Create user'
+  user:
+    name: '{{ username }}'
+    uid: '{{ uid }}'
+    group: '{{ groupname }}'
+...
+# vim: set filetype=yaml:

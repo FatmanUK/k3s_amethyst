@@ -1,0 +1,12 @@
+---
+# Usage:
+#dependencies:
+#  - vars:
+#      config: 'inspircd'
+#    role: 'meta_rsyslog_config'
+
+- name: 'Adding rsyslog config for'
+  debug:
+    var: 'config'
+...
+# vim: set filetype=yaml:

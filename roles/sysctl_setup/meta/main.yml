@@ -1,0 +1,7 @@
+---
+dependencies:
+  - vars:
+      modules: '{{ sysctl_kernel_modules }}'
+    role: 'meta_kernel_mods_load'
+...
+# vim: set filetype=yaml:

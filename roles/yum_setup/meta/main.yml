@@ -1,0 +1,8 @@
+---
+dependencies:
+  - vars:
+      configs:
+        - '/etc/yum.repos.d/rhel.repo'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

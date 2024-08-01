@@ -1,0 +1,33 @@
+---
+ansible_host: '{{ subnet | ipaddr(host_id) | ipaddr("address") }}'
+
+network_gateway: '{{ subnet | ipaddr(gateway_host_id) | ipaddr("address") }}'
+extra_name_servers: '8.8.8.8 8.8.4.4'
+
+vm_disk_filename: '{{ inventory_hostname }}.qcow2'
+
+ansible_user: 'ansible'
+
+registry_tag: 'latest'
+
+fqdn: '{{ inventory_hostname }}.{{ domain }}'
+reverse_zone: '{{ subnet | reverse_zone }}'
+
+k3s_version: 'v1.28.10+k3s1'
+k3s_arch: 'amd64'
+k3s_sha256_checksum: '2e90c4e696899ef37be871ec04986edac5ecf145da3e70e772e6c61f10b5400c'
+k3s_image_list_sha256_checksum: '114d34767bfee10ebb892ffa3448bcda2d46b234746c7bb8a0655419be3afec3'
+
+# k3s and k3s-images.txt both have sha256 hashes at k3s_sha256_checksum_url
+k3s_base_url: 'https://github.com/k3s-io/k3s/releases/download'
+k3s_dl_url: '{{ k3s_base_url }}/{{ k3s_version }}'
+k3s_url: '{{ k3s_dl_url }}/k3s'
+#k3s_sha256_checksum_url: '{{ k3s_dl_url }}/sha256sum-{{ k3s_arch }}.txt'
+k3s_image_list_url: '{{ k3s_dl_url }}/k3s-images.txt'
+
+k3s_tarball: '{{ playbook_dir }}/blobs/k3s-{{ k3s_version }}.tgz'
+
+k3s_binary_dir: '/usr/local/bin'
+k3s_binary: '{{ k3s_binary_dir }}/k3s'
+...
+# vim: set filetype=yaml:

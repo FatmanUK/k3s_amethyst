@@ -1,0 +1,92 @@
+---
+has_iptables: no
+has_nftables: yes
+has_sysconfig: yes
+has_systemd: yes
+has_runit: no
+has_xbps: no
+has_yum: yes
+has_apt: no
+has_dhcpcd: no
+
+systemd_uses_usrlib: yes
+
+update_servers: [ ]
+
+mandatory_access_control: 'selinux'
+
+console_resolution: '896x504'
+
+grub_linux_command_args:
+  - 'nofb'
+  - 'nomodeset'
+  - 'VGA=640x480'
+  - 'crashkernel=auto'
+  #- 'rd.lvm.lv=rhel_k3s-mother-001/root'
+  - 'cgroup_memory=1'
+  - 'cgroup_enable=memory'
+grub_enable_blscfg: yes
+
+# install libosinfo-bin and osinfo-db
+# osinfo-query os | grep ...
+libosinfo_base_url: 'http://redhat.com/rhel'
+os_version: '8.6'
+
+package_manager: 'dnf'
+packages_on_disc: yes
+packages:
+  selinux:
+    #- 'container-selinux'
+    #- 'fapolicyd-selinux'  # not found? TODO check
+    - 'libselinux'
+    - 'libselinux-utils'
+    - 'selinux-policy'
+    - 'libsemanage'
+    - 'libsepol'
+  apparmor: [ ]
+#    - 'apparmor'
+  logrotate:
+    - 'logrotate'
+  rsyslog:
+    - 'rsyslog'
+  iptables: [ ]
+  chrony:
+    - 'chrony'
+
+standard_logs:
+  - '/var/log/messages'
+  - '/var/log/secure'
+  - '/var/log/kdump.log'
+  - '/var/log/maillog'
+  - '/var/log/cron'
+  - '/var/log/spooler'
+
+# TODO: add more
+unneeded_services:
+  - 'k3s'
+
+unneeded_paths:
+  - '/etc/k3s-token'
+  - '/etc/k3s-token-file'
+  - '/etc/issue.new-0.140_8'
+  - '/etc/rc.conf.new-20210314_1'
+  - '/etc/cni/net.d'
+  - '/etc/myname'
+  - '/etc/rancher'
+  - '/etc/sudoers.new-1.9.5p2_2'
+  - '/usr/libexec/kubernetes'
+  - '/usr/lib/virt-sysprep'
+  - '/home/ansible/install_k3s.sh'
+  - '/home/ansible/k3s'
+  - '/var/lib/calico'
+  - '/var/lib/rancher'
+  - '/var/run/containerd'
+
+legacy_rpms:
+  - 'iptables-libs-1.6.2-2.fc28.x86_64.rpm'
+  - 'iptables-1.6.2-2.fc28.x86_64.rpm'
+
+prefix: '/tmp'
+prefixed_legacy_rpms: '{{ [prefix ~ "/"] | product(legacy_rpms) | map("join") | list }}'
+...
+# vim: set filetype=yaml:

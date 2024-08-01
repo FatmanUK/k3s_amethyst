@@ -1,0 +1,14 @@
+{% set host_set = host_defaults %}
+{% set host_set = host_set + update_servers %}
+{% if not purged %}
+{%   set host_set = host_set + host_entries %}
+{%   set host_set = host_set + host_docker %}
+# {{ ansible_managed }}
+{% endif %}
+{% for host in host_set %}
+{%   set s = ([host.domain] | join(" ")) %}
+{%   if host.hostname is defined %}
+{%     set s = ([[host.hostname, host.domain] | join("."), host.hostname] | join(" ")) %}
+{%   endif %}
+{{ host.ip }}{% if (host.ip | length) < 8 %}	{% endif %}	{{ s }}
+{% endfor %}

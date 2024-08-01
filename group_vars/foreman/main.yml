@@ -1,0 +1,6 @@
+---
+# "4 GB" | human_to_bytes ? but in k
+vm_ram_k: 4194304
+vm_cpus: 4
+...
+# vim: set filetype=yaml:

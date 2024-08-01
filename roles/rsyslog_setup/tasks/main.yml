@@ -1,0 +1,30 @@
+---
+# Normalise all the rsyslog services
+- name: 'Stop duplicate services'
+  register: 'reg_systemd'
+  when:
+    - 'has_systemd'
+  vars:
+    e_not_found: 'Could not find the requested service'
+    e_not_loaded: 'Unit rsyslogd.service not loaded'
+  loop:
+    - 'rsyslogd'
+  # doesn't seem doable with systemd module
+  failed_when:
+    - 'reg_systemd.rc != 0'
+    - 'e_not_found not in reg_systemd.stderr'
+    - 'e_not_loaded not in reg_systemd.stderr'
+  command:
+    argv:
+      - 'systemctl'
+      - 'stop'
+      - '{{ item }}'
+
+- name: 'Delete duplicate service files'
+  loop:
+    - '/usr/lib/systemd/system/rsyslogd.service'
+    - '/etc/systemd/system/rsyslogd.service'
+  file:
+    path: '{{ item }}'
+    state: 'absent'
+...

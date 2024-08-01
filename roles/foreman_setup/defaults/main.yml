@@ -1,0 +1,14 @@
+---
+foreman_db_locale: 'en_US.UTF-8'
+foreman_puppet_deb: 'puppet7-release-focal.deb'
+foreman_packages:
+  - 'ca-certificates'
+  - 'foreman-installer'
+foreman_nic: 'eth0'
+foreman_tftp_server: '{{ hostvars[inventory_hostname].ansible_host }}'
+foreman_gateway: '{{ hostvars[groups.builder | first].ansible_host }}'
+foreman_nameserver: '{{ hostvars[groups.builder | first].ansible_host }}'
+foreman_dhcp_range_start: '{{ subnet | ipaddr(foreman_dhcp_range_start_id) | ipaddr("address") }}'
+foreman_dhcp_range_end: '{{ subnet | ipaddr(foreman_dhcp_range_end_id) | ipaddr("address") }}'
+...
+# vim: set filetype=yaml:

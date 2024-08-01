@@ -1,0 +1,30 @@
+---
+# Usage:
+#dependencies:
+#  - vars:
+#      modules:
+#        - 'br_netfilter'
+#        - 'overlay'
+#    role: 'meta_kernel_mods_load'
+
+- name: 'Adding kernel modules'
+  debug:
+    var: 'modules'
+
+- name: 'Load kernel modules'
+  loop: '{{ sysctl_kernel_modules }}'
+  modprobe:
+    name: '{{ item }}'
+    persistent: '{{ "present" if has_systemd else "disabled" }}'
+
+- name: 'Persist kernel modules'
+  when:
+    - 'not has_systemd'
+  loop: '{{ sysctl_kernel_modules }}'
+  lineinfile:
+    path: '/etc/modules'
+    line: '{{ item }}'
+    insertafter: 'EOF'
+    create: yes
+...
+# vim: set filetype=yaml:

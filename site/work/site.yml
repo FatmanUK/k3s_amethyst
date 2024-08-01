@@ -1,0 +1,63 @@
+---
+all:
+  vars:
+    vm_disk_location: '/home/adam.richardson/.local/share/libvirt/images'
+    vm_net_bridge_name: 'core_bridge'
+    subnet: '10.20.0.0/24'
+    domain: 'k3s.lab'
+    gateway_host_id: '253'
+
+os_rhel:
+  vars:
+    packages_disc_dir: '/home/adam.richardson/Downloads'
+    packages_disc: '{{ packages_disc_dir }}/rhel-8.6-x86_64-dvd.iso'
+  hosts:
+    k3s-mother-01:       # possibly not keeping this
+      host_id: '101'
+    k3s-mother-03:       # possibly not keeping this
+      host_id: '103'
+#      ansible_host: 'k3s-mother-03'  # debug value
+#      vm_name: 'k3s-mother-03.k3s.lab'  # debug value
+    k3s-child-01:       # possibly not keeping this
+      host_id: '111'
+
+os_voidlinux:
+  hosts: { }
+
+os_ubuntu:
+  hosts:
+    # is devlaptop068
+    build-1:
+      host_id: '253'
+    # Foreman needs its own environment. Stick it in an Ubuntu VM.
+    # is xenial-playground
+    foreman-1:
+      host_id: '123'
+      vm_mac: '52:54:00:3d:11:5f'
+
+builder:
+  hosts:
+    build-1:
+      ansible_user: 'adam.richardson'
+
+foreman:
+  hosts:
+    foreman-1:
+  vars:
+    foreman_dhcp_range_start_id: '175'
+    foreman_dhcp_range_end_id: '195'
+    foreman_reverse_zone: '{{ subnet | reverse_zone }}'
+
+primaries:
+  hosts:
+    k3s-mother-01:
+
+secondaries:
+  hosts:
+    k3s-mother-03:
+
+agents:
+  hosts:
+    k3s-child-01:
+...
+# vim: set filetype=yaml:

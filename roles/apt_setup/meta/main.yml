@@ -1,0 +1,8 @@
+---
+#dependencies:
+#  - vars:
+#      configs:
+#        - '/etc/apt/sources.list.d/xyz.conf'
+#    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

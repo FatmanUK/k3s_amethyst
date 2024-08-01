@@ -1,0 +1,16 @@
+---
+- name: 'Disable swap'
+  replace:
+    path: '/etc/fstab'
+    regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: 'Stop swap'
+  when:
+    - 'ansible_swaptotal_mb > 0'
+  command:
+    argv:
+      - 'swapoff'
+      - '-a'
+...
+# vim: set filetype=yaml:

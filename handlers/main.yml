@@ -1,0 +1,10 @@
+---
+- name: 'noop'
+  debug:
+    msg: 'noop'
+
+# Reload iptables
+# Reload nftables
+
+...
+# vim: set filetype=yaml:

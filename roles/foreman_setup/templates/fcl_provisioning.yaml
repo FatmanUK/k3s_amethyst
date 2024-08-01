@@ -1,0 +1,63 @@
+<%#
+---
+kind: provision
+name: Flatcar Container Linux provision
+model: ProvisioningTemplate
+oses:
+  - Flatcar
+description: |
+  Provisioning template for the Flatcar Container Linux distribution.
+-%>
+<%
+	config = <<EOS
+---
+systemd:
+  units:
+    - name: installer.service
+      enabled: true
+      contents: |
+        [Unit]
+        Requires=network-online.target
+        After=network-online.target
+        [Service]
+        Type=forking
+        TimeoutStartSec=600
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/sh -c "flatcar-install -d /dev/vda -i /opt/ignition.json && udevadm settle && systemctl reboot"
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /boot/boot.msg
+      filesystem: root
+      mode: 777
+      contents:
+        inline: |
+          XXXXXX
+          XXXXXX
+          XXXXXX
+          XXXXXX
+          XXXXXX
+    - path: /opt/ignition.json
+      filesystem: root
+      mode: 777
+      contents:
+        inline: |
+          storage:
+            files:
+              - filesystem: 'root'
+                path: '/home/core/post_install'
+                mode: 775
+                contents:
+                  inline: |
+                    #{indent(10) { snippet_if_exists('Flatcar Container Linux provision post') }}
+          passwd:
+            users:
+              - name: core
+                passwd: #{root_pass}
+                ssh_authorized_keys:
+                  - 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDsT0gTfh53m29HaXF5fXiPofNHipHQ8acMP88RzExrgOoemq/RWHbd6DSPzQPtV4KhG3LQS4H6RsyDq4Zwg45K+J4bXnu/DPcwhMF96FlnBTaoPJukzuY1nZe16OXnhAM1HuqKdiNYkH7wORvMiSM0DwXqA3kKkWklnok4A9sLzSXMcAtd5z9EPUD3QI1dAxyDqx/v00GeEjQMWBr5lApmE1BlXHK1Ij3xQEPSuLms611RQkmJu/XnESvv4jusucK5ds02NmQdIw8YAIgmq/qQjaVgaLYeCEYWklQMduagg4kBkA3q28tZLpeaRqzbSHTgfDyWWBv80S2/LH8kzyo1hcrYCslHGApoQwuMbHOdHeSG7M/GuzS4ysHX93pCFfu8leNL+iqkRTGuzAeBEN3sgFAFFstAKxXmAso4FHylcERSu9dGcZCowieWCMvsCJrTQFC0SxTcVgCm9AQPkI7U+JWDN+zIOMXpVSCLtOs4TNCRKnRvlDcPURFGf+YDGl8= fatman@ajr-hcs-lap-03.dreamtrack.co.uk'
+          systemd: {}
+EOS
+-%>
+<%= transpile_coreos_linux_config(config) -%>

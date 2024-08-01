@@ -1,0 +1,8 @@
+---
+nodes:
+  children:
+    primaries:
+    secondaries:
+    agents:
+...
+# vim: set filetype=yaml:

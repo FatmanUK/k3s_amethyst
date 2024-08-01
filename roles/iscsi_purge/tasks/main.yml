@@ -1,0 +1,13 @@
+---
+- name: 'Delete iSCSI targets'
+  loop:
+    - 'absent'
+    - 'directory'
+  file:
+    state: '{{ item }}'
+    path: '/var/lib/iscsi/nodes'
+    mode: '0755'
+    owner: 'root'
+    group: 'root'
+...
+# vim: set filetype=yaml:

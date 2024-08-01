@@ -1,0 +1,9 @@
+---
+dependencies:
+  - vars:
+      purged: yes
+      configs:
+        - '/etc/hosts'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

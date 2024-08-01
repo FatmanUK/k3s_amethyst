@@ -1,0 +1,9 @@
+---
+- name: 'Enable sysctl settings'
+  loop: '{{ sysctl_settings }}'
+  sysctl:
+    reload: yes
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+...
+# vim: set filetype=yaml:

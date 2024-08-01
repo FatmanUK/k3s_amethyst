@@ -1,0 +1,12 @@
+---
+# Usage:
+#dependencies:
+#  - vars:
+#      config: 'inspircd'
+#    role: 'meta_logrotate_config'
+
+- name: 'Adding logrotate config for'
+  debug:
+    var: 'config'
+...
+# vim: set filetype=yaml:

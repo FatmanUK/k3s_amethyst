@@ -1,0 +1,15 @@
+---
+dependencies:
+  - vars:
+      package_set: 'logrotate'
+    role: 'meta_package_install'
+  - vars:
+      configs:
+        - '/etc/logrotate.conf'
+    role: 'meta_rootfile_template'
+  - vars:
+      paths:
+        - '/etc/logrotate.d'
+    role: 'meta_rootdir_create'
+...
+# vim: set filetype=yaml:

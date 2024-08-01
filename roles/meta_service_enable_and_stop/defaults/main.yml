@@ -1,0 +1,22 @@
+---
+service_files_runit:
+  - file: '/etc/sv/{{ service }}/finish'
+    mode: '0755'
+  - file: '/etc/sv/{{ service }}/conf'
+    mode: '0644'
+  - file: '/etc/sv/{{ service }}/run'
+    mode: '0755'
+
+service_files_systemd:
+  - file: '{{ "/usr/lib"
+              if has_systemd and systemd_uses_usrlib
+              else "/etc" }}/systemd/system/{{ service }}.service'
+    mode: '0644'
+
+service_files: '{{ service_files_runit
+                   if has_runit
+                   else (service_files_systemd
+                         if has_systemd
+                         else []) }}'
+...
+# vim: set filetype=yaml:

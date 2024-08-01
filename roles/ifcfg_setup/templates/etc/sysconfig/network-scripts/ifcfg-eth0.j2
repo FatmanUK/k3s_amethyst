@@ -1,0 +1,12 @@
+# {{ ansible_managed }}
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+ONBOOT=yes
+IPADDR={{ ansible_host }}
+PREFIX={{ subnet | ipaddr("prefix") }}
+DEVICE=eth0
+#HWADDR=?
+#UUID=?

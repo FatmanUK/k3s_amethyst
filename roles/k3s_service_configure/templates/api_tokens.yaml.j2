@@ -1,0 +1,86 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: node-api-viewer
+  namespace: kube-system
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pod-api-viewer
+  namespace: kube-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: node-get-role
+rules:
+  - resources: [ "nodes" ]
+    apiGroups: [ "" ]
+    verbs:
+      - "get"
+      - "list"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pod-get-role
+rules:
+  - resources: [ "pods" ]
+    apiGroups: [ "" ]
+    verbs:
+      - "get"
+      - "list"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: node-view-bind
+subjects:
+  - kind: ServiceAccount
+    name: node-api-viewer
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: node-get-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pod-view-bind
+subjects:
+  - kind: ServiceAccount
+    name: pod-api-viewer
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: pod-get-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: node-api-viewer-token
+  namespace: kube-system
+  annotations:
+    kubernetes.io/service-account.name: node-api-viewer
+type: kubernetes.io/service-account-token
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pod-api-viewer-token
+  namespace: kube-system
+  annotations:
+    kubernetes.io/service-account.name: pod-api-viewer
+type: kubernetes.io/service-account-token
+...

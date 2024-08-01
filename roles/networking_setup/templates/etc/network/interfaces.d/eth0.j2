@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+auto eth0
+iface eth0 inet static
+	address {{ ansible_host }}
+	netmask {{ subnet | ipaddr("netmask") }}
+	network {{ subnet.split("/") | first }}
+	broadcast {{ (subnet | ipaddr(255)).split("/") | first }}
+	gateway {{ network_gateway }}
+	# dns-* options are implemented by the resolvconf package, if installed
+	dns-nameservers {{ network_gateway }} {{ extra_name_servers }}
+	dns-search {{ domain }}

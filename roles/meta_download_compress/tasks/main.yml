@@ -1,0 +1,63 @@
+---
+- name: 'Ensure directory exists'
+  file:
+    path: '{{ tarball | dirname }}'
+    state: 'directory'
+
+- name: 'Check if tarball exists already'
+  register: 'reg_tarball'
+  connection: 'local'
+  run_once: yes
+  become: no
+  stat:
+    path: '{{ tarball }}'
+
+- name: 'Get checksum from tarballed file'
+  when: 'reg_tarball.stat.exists'
+  register: 'reg_checksum'
+  connection: 'local'
+  run_once: yes
+  become: no
+  archived_checksum:
+    path: '{{ tarball }}'
+    archived_file: '{{ filename }}'
+
+- name: 'Download specified binaries'
+  register: 'reg_download'
+  when: 'not reg_tarball.stat.exists
+         or reg_checksum.checksum != checksum'
+  connection: 'local'
+  run_once: yes
+  become: no
+  retries: 5
+  delay: 5
+  until: 'reg_download is success'
+  get_url:
+    url: '{{ url }}'
+    dest: '{{ tarball | dirname }}/{{ filename }}'
+    checksum: 'sha256:{{ checksum }}'
+    use_proxy: no
+
+- name: 'Tarball up binaries'
+  when: 'not reg_tarball.stat.exists
+         or reg_checksum.checksum != checksum'
+  connection: 'local'
+  run_once: yes
+  become: no
+  vars:
+    cmd:
+      - 'scripts/tarball_create.bash'
+      - '{{ tarball | quote }}'
+      - '{{ tarball | dirname }}'
+    files:
+      - '{{ filename }}'
+  args:
+    executable: '/bin/bash'
+  script: '{{ (cmd + files) | join(" ") }}'
+
+- name: 'Remove interim file'
+  file:
+    path: '{{ tarball | dirname }}/{{ filename }}'
+    state: 'absent'
+...
+# vim: set filetype=yaml:

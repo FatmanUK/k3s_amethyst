@@ -1,0 +1,8 @@
+#!/bin/sh
+# {{ ansible_managed }}
+
+[ -f ./conf ] && . ./conf
+
+modprobe br_netfilter
+modprobe overlay
+exec /usr/local/bin/k3s ${OPTS:-} 2>&1

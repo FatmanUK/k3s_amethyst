@@ -1,0 +1,18 @@
+---
+# Note, at work site there is an iptables issue.
+# Needs iptables -I INPUT 1 -ptcp --dport 5000 -j ACCEPT
+# TODO: check if iptables blocks the pull-through cache and if so add a rule (eg. iptables -I INPUT 1 -ptcp --dport 5000 -j ACCEPT -m comment comment "Docker registry for Kubernetes clusters")
+# TODO: oh, this could be another meta role: meta_iptables_poke_hole or something
+dependencies:
+  - vars:
+      configs:
+        - '/etc/rancher/k3s/registries.yaml'
+    role: 'meta_rootfile_template'
+  - vars:
+      paths: '{{ k3s_data_dirs }}'
+    role: 'meta_rootdir_create'
+  - vars:
+      service: 'k3s'
+    role: 'meta_service_enable_and_stop'
+...
+# vim: set filetype=yaml:

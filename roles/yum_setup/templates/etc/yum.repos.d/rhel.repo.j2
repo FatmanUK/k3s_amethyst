@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+{% if os_version == "8.6" -%}
+[AppStream]
+name=Red Hat Enterprise Linux {{ os_version }}.0
+mediaid=None
+metadata_expire=-1
+gpgcheck=1
+cost=500
+enabled=1
+baseurl=file:///mnt/disc/AppStream/
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+[BaseOS]
+name=Red Hat Enterprise Linux {{ os_version }}.0
+mediaid=None
+metadata_expire=-1
+gpgcheck=1
+cost=500
+enabled=1
+baseurl=file:///mnt/disc/BaseOS/
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+{%- endif -%}

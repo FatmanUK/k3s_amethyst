@@ -1,0 +1,166 @@
+---
+- name: 'Checks'
+  import_playbook: 'checks.yml'
+
+# useful to find empty files: $ find roles/ -size 35c
+
+# wget https://github.com/coreos/container-linux-config-transpiler
+#     /releases/download/v0.9.0/ct-v0.9.0-x86_64-unknown-linux-gnu
+# install ct-v0.9.0-x86_64-unknown-linux-gnu /usr/bin/ct -m0755
+
+# TODO make vm - disk_setup, virsh_setup ?
+# see roles/foreman_setup/templates/vmspec.xml.j2 (might be symlinks
+# from other roles?)
+
+- name: 'Basic setup of nodes and Foreman host'
+  hosts: 'foreman:nodes'
+  become: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'foreman'
+    - 'nodes'
+  roles:
+    - role: 'xbps_setup'
+      when:
+        - 'has_xbps'
+    - role: 'yum_setup'
+      when:
+        - 'has_yum'
+    - role: 'apt_setup'
+      when:
+        - 'has_apt'
+    - role: 'rsyslog_setup'
+#      tags:
+#        - 'debugging'
+    - role: 'service_start'
+      vars:
+        services:
+          - 'rsyslog'
+    - role: 'logrotate_setup'
+#      tags:
+#        - 'debugging'
+    - 'openssh_server_setup'
+    - role: 'selinux_setup'
+      when:
+        - 'mandatory_access_control == "selinux"'
+    - role: 'apparmor_setup'
+      when:
+        - 'mandatory_access_control == "apparmor"'
+    - 'grub_setup'
+    - 'services_tidy'
+    - 'files_tidy'
+    - role: 'iptables_setup'
+      when:
+        - 'has_iptables'  # is this right? maybe redesign this role
+    - role: 'service_start'
+      when:
+        - 'has_iptables'
+      vars:
+        services:
+          - 'iptables'
+    - role: 'dhcpcd_setup'
+      when:
+        - 'has_dhcpcd'
+    - role: 'service_start'
+      when:
+        - 'has_dhcpcd'
+      vars:
+        services:
+          - 'dhcpcd'
+    - role: 'ifcfg_setup'
+      when:
+        - 'not has_dhcpcd'
+        - 'has_sysconfig'
+    - role: 'networking_setup'
+      when:
+        - 'not has_dhcpcd'
+        - 'not has_sysconfig'
+    - 'chrony_setup'
+# Ubuntu hates chrony apparently?
+# TODO: fix
+#    - role: 'service_start'
+#      vars:
+#        services:
+#          - 'chronyd'
+#      tags:
+#        - 'debugging'
+    #- 'do_nothing'
+    #- 'fail_egregiously'
+
+- name: 'Prepare Foreman'
+  hosts: 'foreman'
+  become: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'foreman'
+    - 'never'  # remove 'never' when foreman_setup role is bulletproof
+  roles:
+    - 'foreman_setup'
+
+- name: 'Prepare builder'
+  hosts: 'builder'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'builder'
+    - 'never'
+  roles:
+    - 'k3s_tarball_prep'
+    - 'images_pull'
+
+- name: 'Prepare nodes'
+  hosts: 'nodes'
+  become: yes
+  gather_facts: yes
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'nodes'
+  roles:
+    - 'sysctl_setup'
+    - 'swap_disable'
+    - 'iscsi_setup'
+    - 'hosts_file_setup'
+    - 'k3s_service_setup'
+    - role: 'service_start'
+      vars:
+        services:
+          - 'iscsi'
+          - 'iscsid'
+          - 'k3s'
+    - 'k3s_service_configure'
+    - 'do_nothing'
+    - 'calico_install'
+
+# TODO: further split up k3s roles? Per-hostgroup plays
+# would make some things easier.
+# k3s_service_setup (but only the service part) on nodes
+# k3s_...?
+
+- name: 'Post-install auto-snapshot'
+  hosts: 'foreman:nodes'
+  connection: 'local'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'foreman'
+    - 'nodes'
+    - 'snapshot'
+  vars:
+    snapshot_name: 'post-install-autosnap'
+  roles:
+    - 'snapshot_delta_commit'
+    - 'snapshot_delta_create'
+
+# That's the install phase done... TODO bootstrap and appinstall
+
+...
+# vim: set filetype=yaml:
