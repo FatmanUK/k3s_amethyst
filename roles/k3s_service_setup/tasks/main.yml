@@ -11,7 +11,7 @@
     regexp: '^{{ regex_prefix }}((:?(?!{{ regex_negative_lookahead }}).)*?){{ regex_suffix }}$'
     replace: '\1{{ replace_internal }}\4'
 
-# TODO: would a symlink do/be better?
+# TODO #16: would a symlink do/be better?
 - name: 'Copy hostname to nodename'
   copy:
     remote_src: yes

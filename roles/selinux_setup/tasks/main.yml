@@ -4,7 +4,7 @@
     policy: 'targeted'
     state: 'permissive'
 
-# TODO: set up selinux? how to?
+# TODO #27: set up selinux? how to?
 
 # think this needs looking at in more detail
 

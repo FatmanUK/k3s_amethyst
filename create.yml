@@ -8,7 +8,7 @@
 #     /releases/download/v0.9.0/ct-v0.9.0-x86_64-unknown-linux-gnu
 # install ct-v0.9.0-x86_64-unknown-linux-gnu /usr/bin/ct -m0755
 
-# TODO make vm - disk_setup, virsh_setup ?
+# TODO #12 make vm - disk_setup, virsh_setup ?
 # see roles/foreman_setup/templates/vmspec.xml.j2 (might be symlinks
 # from other roles?)
 
@@ -79,7 +79,7 @@
         - 'not has_sysconfig'
     - 'chrony_setup'
 # Ubuntu hates chrony apparently?
-# TODO: fix
+# TODO #13: fix
 #    - role: 'service_start'
 #      vars:
 #        services:
@@ -138,10 +138,7 @@
     - 'do_nothing'
     - 'calico_install'
 
-# TODO: further split up k3s roles? Per-hostgroup plays
-# would make some things easier.
-# k3s_service_setup (but only the service part) on nodes
-# k3s_...?
+# TODO #14: continue k3s setup, metallb, etc. bootstrap and appinstall
 
 - name: 'Post-install auto-snapshot'
   hosts: 'foreman:nodes'
@@ -159,8 +156,5 @@
   roles:
     - 'snapshot_delta_commit'
     - 'snapshot_delta_create'
-
-# That's the install phase done... TODO bootstrap and appinstall
-
 ...
 # vim: set filetype=yaml:

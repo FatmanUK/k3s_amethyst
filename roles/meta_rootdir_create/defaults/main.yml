@@ -1,5 +1,5 @@
 ---
-# TODO: add a list of excluded protected directories
+# TODO #22: add a list of excluded protected directories
 exempt_directories:
   - '/etc'
 ...

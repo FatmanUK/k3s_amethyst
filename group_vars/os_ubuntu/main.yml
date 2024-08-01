@@ -77,7 +77,7 @@ standard_logs:
   - '/var/log/cron'
   - '/var/log/spooler'
 
-# TODO: add more
+# TODO #9: add more
 unneeded_services:
   - 'k3s'
 
