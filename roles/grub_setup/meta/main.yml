@@ -1,5 +1,5 @@
 ---
-# TODO: reconfigure GRUB to use predictable nic names
+# TODO #25: reconfigure GRUB to use predictable nic names
 # maybe make use of /etc/default/grub.d or whatever it was?
 dependencies:
   - vars:

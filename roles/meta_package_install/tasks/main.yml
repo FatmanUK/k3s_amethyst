@@ -34,7 +34,7 @@
 #  script: '{{ cmd | join(" ") }}'
 
 # This one has a variety of ways to fail, and it's not even using command
-# module. :/ TODO: Possibly replace with script?
+# module. :/ TODO #20: Possibly replace with script?
 - name: 'Create local repo mountpoint'
   register: 'reg_mkdir'
   when:
@@ -120,7 +120,7 @@
 
 - name: 'Install packages'
   when:
-    # TODO: fix this properly!
+    # TODO #21: fix this properly!
     # This is a poor workaround for the 'python3-apt must be installed and visible from /usr/bin/python3' bug
     - 'not has_apt'
   package:

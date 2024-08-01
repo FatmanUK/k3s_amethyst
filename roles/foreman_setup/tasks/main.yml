@@ -101,7 +101,7 @@
       - 'apt-get'
       - 'update'
 
-# TODO: use meta_package_install here?
+# TODO #15: use meta_package_install here?
 - name: 'Install packages'
   loop: '{{ foreman_packages }}'
   apt:

@@ -37,7 +37,7 @@ packages_on_disc: yes
 packages:
   selinux:
     #- 'container-selinux'
-    #- 'fapolicyd-selinux'  # not found? TODO check
+    #- 'fapolicyd-selinux'  # not found? TODO #11 check
     - 'libselinux'
     - 'libselinux-utils'
     - 'selinux-policy'
@@ -61,7 +61,7 @@ standard_logs:
   - '/var/log/cron'
   - '/var/log/spooler'
 
-# TODO: add more
+# TODO #10: add more
 unneeded_services:
   - 'k3s'
 

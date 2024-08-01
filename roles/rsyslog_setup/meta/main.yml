@@ -1,5 +1,4 @@
 ---
-# TODO: do config properly
 dependencies:
   - vars:
       package_set: 'rsyslog'

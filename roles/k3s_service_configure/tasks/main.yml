@@ -69,7 +69,7 @@
     var: 'server_token'
 
 # The service files deliberately have a line missing. It's added here.
-# TODO: maybe use replace instead so it's more obvious in the file?
+# TODO #24: maybe use replace instead so it's more obvious in the file?
 - name: 'Append final line to service file'
   vars:
     path_systemd: '/usr/lib/systemd/system/k3s.service'
