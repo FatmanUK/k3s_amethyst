@@ -7,19 +7,13 @@ all:
     domain: 'dreamtrack.test'
     gateway_host_id: '254'
 
-os_rhel:
-  hosts: { }
-
 os_voidlinux:
   hosts:
-    # is home laptop
-    build-01:
-      host_id: '254'
     k3s-mother-01:
       host_id: '1'
-    #k3s-mother-02:  # possibly not keeping this
+    #k3s-mother-02:
     #  host_id: '2'
-    k3s-mother-03:  # possibly not keeping this
+    k3s-mother-03:
       host_id: '3'
     #k3s-child-01:
     #  host_id: '11'
@@ -27,20 +21,10 @@ os_voidlinux:
     #  host_id: '12'
     k3s-child-03:
       host_id: '13'
-
-os_ubuntu:
-  hosts:
-    # Foreman needs its own environment. Stick it in an Ubuntu VM.
-    # is xenial-playground
-    #foreman-01:
-    #  host_id: '123'
-    #  vm_mac: '52:54:00:fb:90:27'
-    foreman-02:
-      host_id: '124'
-
-builder:
-  hosts:
-    build-01:
+    #k3s-child-04:
+    #  host_id: '14'
+    k3s-child-05:
+      host_id: '15'
 
 foreman:
   hosts:
@@ -61,5 +45,6 @@ secondaries:
 agents:
   hosts:
     k3s-child-03:
+    k3s-child-05:
 ...
 # vim: set filetype=yaml:

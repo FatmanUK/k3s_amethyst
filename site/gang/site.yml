@@ -1,33 +1,38 @@
 ---
 all:
   vars:
-    #vm_disk_location: '/home/adam.richardson/.local/share/libvirt/images'
-    vm_net_bridge_name: 'virbr0'
     subnet: '10.7.6.0/24'
     domain: 'dreamtrack.net'
     # "host id" of the subnet gateway
     gateway_host_id: '254'
 
-os_rhel:
-  hosts: { }
-
 os_voidlinux:
   hosts:
-    # is gang-mother-03
-    mother-3:       # possibly not keeping this
+    gang-mother-01:
+      host_id: '212'
+    gang-mother-02:
+      host_id: '213'
+    gang-mother-03:
       host_id: '214'
-      ansible_host: 'gang-mother-03'  # debug value
-      vm_name: 'its not a vm'  # debug value
 
-os_ubuntu:
+foreman:
   hosts:
-    # is devlaptop680
-    build-1:
-      host_id: '253'
-    # Foreman needs its own environment. Stick it in an Ubuntu VM.
-    # is xenial-playground
-    foreman-1:
-      host_id: '133'
-      vm_mac: '52:54:00:3d:11:5f'
+    foreman-02:
+  vars:
+    foreman_dhcp_range_start_id: '175'
+    foreman_dhcp_range_end_id: '195'
+    foreman_reverse_zone: '{{ subnet | reverse_zone }}'
+
+primaries:
+  hosts:
+    gang-mother-01:
+
+secondaries:
+  hosts:
+    gang-mother-02:
+
+agents:
+  hosts:
+    gang-mother-03:
 ...
 # vim: set filetype=yaml:
