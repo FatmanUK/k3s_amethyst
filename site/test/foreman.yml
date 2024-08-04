@@ -1,0 +1,26 @@
+---
+os_voidlinux:
+  hosts:
+    build-01:
+      host_id: '254'
+
+os_rhel:
+  hosts: { }
+
+os_ubuntu:
+  hosts:
+    # Foreman needs its own environment.
+    # Stick it in an Ubuntu VM.
+    foreman-02:
+
+foreman:
+  hosts:
+    foreman-02:
+      host_id: '124'
+      subnet: '10.11.0.0/24'
+
+builder:
+  hosts:
+    build-01:
+...
+# vim: set filetype=yaml:
