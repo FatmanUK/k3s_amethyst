@@ -1,0 +1,12 @@
+---
+dependencies:
+  - vars:
+      repo_name: 'bitnami'
+      repo_url: 'https://charts.bitnami.com/bitnami'
+      chart_name: 'cert-manager'
+      chart_version: '{{ cert_manager_version }}'
+      chart_namespace: '{{ cert_manager_namespace }}'
+      chart_install_timeout: '{{ cert_manager_install_timeout }}'
+    role: 'meta_helm_chart_install'
+...
+# vim: set filetype=yaml:

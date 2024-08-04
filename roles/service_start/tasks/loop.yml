@@ -18,12 +18,25 @@
     name: '{{ item }}'
     state: 'started'
 
+- name: 'Enable systemd service'
+  when:
+    - 'has_systemd'
+  command:
+    argv:
+      - 'systemctl'
+      - 'enable'
+      - '{{ item }}'
+#  systemd:
+#    name: '{{ item }}'
+#    #enabled: yes  # apparently, doesn't work
+#    state: 'enabled'
+
 - name: 'Start systemd service'
   when:
     - 'has_systemd'
   systemd:
     name: '{{ item }}'
-    enabled: yes
+    #enabled: yes  # apparently, doesn't work
     state: 'started'
 ...
 # vim: set filetype=yaml:

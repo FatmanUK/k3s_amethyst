@@ -67,6 +67,8 @@ packages:
     - 'iptables'
   chrony:
     - 'chrony'
+  helm:
+    - 'kubernetes-helm'
 
 standard_logs:
   - '/var/log/secure'

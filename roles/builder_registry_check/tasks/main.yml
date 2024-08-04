@@ -17,8 +17,11 @@
     argv:
       - 'scripts/registry_start_run.bash'
       - '{{ registry_tag }}'
+      - '{{ item.name }}'
+      - '{{ item.port }}'
   args:
     executable: '/bin/bash'
+  loop: '{{ mirrors }}'
   script: '{{ argv | join(" ") }}'
 ...
 # vim: set filetype=yaml:

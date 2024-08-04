@@ -8,7 +8,7 @@
 
 # think this needs looking at in more detail
 
-# hmm https://access.redhat.com/articles/7047896
+# hmm https://t.ly/S7Kz5
 
 #- name: Set SELinux to Enforcing Mode
 #  ansible.posix.selinux:

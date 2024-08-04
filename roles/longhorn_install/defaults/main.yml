@@ -1,0 +1,4 @@
+---
+longhorn_namespace: 'longhorn-system'
+...
+# vim: set filetype=yaml:

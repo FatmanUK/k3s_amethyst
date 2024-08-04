@@ -1,12 +1,18 @@
 #!/bin/bash
 set -euo pipefail
 
+# $1: registry image version, defaults to 'latest'
+# $2: target registry
+# $3: port
+
+CONTAINER_NAME="registry_$3"
+
 start() {
-	podman start registry
+	podman start ${CONTAINER_NAME}
 }
 
 unpause() {
-	podman unpause registry
+	podman unpause ${CONTAINER_NAME}
 }
 
 noop() {
@@ -16,19 +22,24 @@ noop() {
 # podman exec -it registry /bin/sh
 # vi /etc/docker/registry/config.yml 
 
+# $1: registry image version, defaults to 'latest'
+# $2: name
+# $3: port
+# ${CONTAINER_NAME}
+
 create() {
-	SRC='./registry'
+	SRC="./registry_$3"
 	DEST='/etc/docker/registry'
-	PORTS='5000:5000'
-	podman run -d -p ${PORTS} -v ${SRC}:${DEST} --http-proxy=false \
-		--name registry registry:$1
+	podman run -d -p "$3:5000" -v ${SRC}:${DEST} \
+		--http-proxy=false --name ${CONTAINER_NAME} \
+		registry:$1
 }
 
-JQ_PROGRAM=".[] | select(.Names[] == \"registry\") | .State"
+JQ_PROGRAM=".[] | select(.Names[] == \"${CONTAINER_NAME}\") | .State"
 STATUS=$(podman ps --all --format=json | jq -r "${JQ_PROGRAM}")
 
 #if [ "xx" == "x${STATUS}x" ]; then
-#	create
+#	create $1 x $3
 #else
 	case ${STATUS} in
 		created | exited)
@@ -41,7 +52,7 @@ STATUS=$(podman ps --all --format=json | jq -r "${JQ_PROGRAM}")
 			noop
 			;;
 		*)
-			create $1
+			create $1 x $3
 			;;
 	esac
 #fi

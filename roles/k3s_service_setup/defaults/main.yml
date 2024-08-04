@@ -16,8 +16,8 @@ k3s_service_opts_str: '{{ k3s_service_opts | join(" ") }}'
 k3s_secondary_args:
   - '--server={{ k3s_master_domain }}:6443'
   - '--token={{ server_token.strip() }}'
-pre_reboot_delay_s: 10
-post_reboot_delay_s: 10
-settle_delay_s: 30
+#pre_reboot_delay_s: 10
+#post_reboot_delay_s: 10
+#settle_delay_s: 30
 ...
 # vim: set filetype=yaml:

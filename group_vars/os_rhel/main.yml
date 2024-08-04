@@ -52,6 +52,7 @@ packages:
   iptables: [ ]
   chrony:
     - 'chrony'
+  helm: [ ]
 
 standard_logs:
   - '/var/log/messages'

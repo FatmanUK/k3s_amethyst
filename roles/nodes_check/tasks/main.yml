@@ -1,0 +1,17 @@
+---
+- name: 'Wait for nodes to exist'
+  register: 'reg_nodes'
+  delegate_to: '{{ groups.primaries | first }}'
+  retries: 100
+  delay: 20
+  until:
+    - 'reg_nodes is success'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'get'
+      - 'node'
+      - '{{ inventory_hostname }}.{{ domain }}'
+
+...
+# vim: set filetype=yaml:

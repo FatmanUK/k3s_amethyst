@@ -1,8 +1,12 @@
 ---
 dependencies:
   - vars:
+      package_set: 'networking'
+    role: 'meta_package_install'
+  - vars:
       configs:
         - '/etc/network/interfaces.d/eth0'
+        - '/etc/network/interfaces'
         - '/etc/hostname'
     role: 'meta_rootfile_template'
 ...

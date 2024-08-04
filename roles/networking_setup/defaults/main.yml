@@ -1,0 +1,34 @@
+---
+reinstate_cmd:
+  - 'systemctl'
+
+reinstate_steps:
+  -
+    - 'unmask'
+    - 'networking'
+  -
+    - 'enable'
+    - 'networking'
+  -
+    - 'restart'
+    - 'networking'
+  -
+    - 'stop'
+    - 'systemd-networkd.socket'
+    - 'systemd-networkd'
+    - 'networkd-dispatcher'
+    - 'systemd-networkd-wait-online'
+  -
+    - 'disable'
+    - 'systemd-networkd.socket'
+    - 'systemd-networkd'
+    - 'networkd-dispatcher'
+    - 'systemd-networkd-wait-online'
+  -
+    - 'mask'
+    - 'systemd-networkd.socket'
+    - 'systemd-networkd'
+    - 'networkd-dispatcher'
+    - 'systemd-networkd-wait-online'
+...
+# vim: set filetype=yaml:

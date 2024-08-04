@@ -32,9 +32,11 @@ os_ubuntu:
   hosts:
     # Foreman needs its own environment. Stick it in an Ubuntu VM.
     # is xenial-playground
-    foreman-01:
-      host_id: '123'
-      vm_mac: '52:54:00:fb:90:27'
+    #foreman-01:
+    #  host_id: '123'
+    #  vm_mac: '52:54:00:fb:90:27'
+    foreman-02:
+      host_id: '124'
 
 builder:
   hosts:
@@ -42,7 +44,7 @@ builder:
 
 foreman:
   hosts:
-    foreman-01:
+    foreman-02:
   vars:
     foreman_dhcp_range_start_id: '175'
     foreman_dhcp_range_end_id: '195'

@@ -1,0 +1,29 @@
+---
+- name: 'Prove all can access the token'
+  debug:
+    var: 'server_token'
+
+# The service files deliberately have a line missing. It's added here.
+# TODO #24: maybe use replace instead so it's more obvious in the file?
+- name: 'Append final line to service file'
+  vars:
+    path_systemd: '/usr/lib/systemd/system/k3s.service'
+    path_runit: '/etc/sv/k3s/conf'
+    line_systemd: 'ExecStart=/usr/local/bin/k3s {{ k3s_service_opts_str }}'
+    line_runit: 'OPTS="{{ k3s_service_opts_str }}"'
+  lineinfile:
+    path: '{{ path_systemd if has_systemd else path_runit }}'
+    line: '{{ line_systemd if has_systemd else line_runit }}'
+    insertafter: 'EOF'
+
+- name: 'Cycle TLS certificates directory'
+  when:
+    - 'not is_primary'
+  loop:
+    - 'absent'
+    - 'directory'
+  file:
+    state: '{{ item }}'
+    path: '/var/lib/rancher/k3s/server/tls'
+...
+# vim: set filetype=yaml:
