@@ -26,13 +26,17 @@ foreman:
 primaries:
   hosts:
     gang-mother-01:
+  vars:
+    # in a real production environment we would be happy with 3,
+    # just don't define this (it's the default)
+    longhorn_number_of_replicas: 1
 
 secondaries:
   hosts:
     gang-mother-02:
+    gang-mother-03:
 
 agents:
-  hosts:
-    gang-mother-03:
+  hosts: { }
 ...
 # vim: set filetype=yaml:

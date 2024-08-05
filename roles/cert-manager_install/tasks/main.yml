@@ -1,0 +1,73 @@
+---
+- name: 'Set up automatic certificate rotation'
+  vars:
+    issuers_yaml: |
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Issuer
+      metadata:
+        name: {{ ca_certificate_issuer }}
+        namespace: {{ cert_manager_namespace }}
+      spec:
+        selfSigned: {}
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: {{ ca_certificate_name }}
+        namespace: {{ cert_manager_namespace }}
+      spec:
+        secretName: {{ ca_secret_name }}
+        privateKey:
+          algorithm: {{ ca_key_algorithm }}
+          encoding: {{ ca_key_encoding }}
+          size: {{ ca_key_size }}
+        duration: {{ ca_duration_h }}h
+        renewBefore: {{ ca_renew_before_h }}h
+        isCA: true
+        subject:
+          organizations:
+            - '{{ ca_org }}'
+        emailAddresses:
+          - '{{ ca_email }}'
+        issuerRef:
+          name: {{ ca_certificate_issuer }}
+          kind: Issuer
+          group: cert-manager.io
+      ---
+      apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: {{ certificate_issuer }}
+        namespace: {{ cert_manager_namespace }}
+      spec:
+        ca:
+          secretName: {{ ca_secret_name }}
+      ...
+  environment:
+    stdin: '{{ issuers_yaml }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'apply'
+      - '-f'
+      - '-'
+
+- name: 'Get the CA certificate in PEM format (for loading into Firefox)'
+  register: 'reg_ca_crt'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'get'
+      - '-n'
+      - '{{ cert_manager_namespace }}'
+      - 'secret/{{ ca_secret_name }}'
+      - '-o'
+      - 'jsonpath="{.data.ca\.crt}"'
+
+- name: 'Dump certificate to a file'
+  copy:
+    content: '{{ reg_ca_crt.stdout | b64decode }}'
+    dest: 'k3s-ca.crt'
+...
+# vim: set filetype=yaml:

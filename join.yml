@@ -1,0 +1,16 @@
+---
+- name: 'Join new node to cluster'
+  hosts: 'nodes'
+  become: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  vars:
+    services:
+      - 'k3s'
+  roles:
+    - 'k3s_service_setup'
+    - 'k3s_service_add_token'
+    - 'service_start'
+...
+# vim: set filetype=yaml:

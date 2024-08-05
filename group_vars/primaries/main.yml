@@ -1,4 +1,5 @@
 ---
-
+ca_certificate_issuer: 'selfsigned-issuer'
+certificate_issuer: 'k3s-amethyst-issuer'
 ...
 # vim: set filetype=yaml:

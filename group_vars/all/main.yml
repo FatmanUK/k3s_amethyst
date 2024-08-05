@@ -2,7 +2,7 @@
 ansible_host: '{{ subnet | ipaddr(host_id) | ipaddr("address") }}'
 
 network_gateway: '{{ subnet | ipaddr(gateway_host_id) | ipaddr("address") }}'
-extra_name_servers: '8.8.8.8 8.8.4.4'
+extra_name_servers: '10.43.0.10'
 
 vm_disk_filename: '{{ inventory_hostname }}.qcow2'
 
@@ -41,6 +41,7 @@ k3s_binary: '{{ k3s_binary_dir }}/k3s'
 
 helm_filename: 'helm'
 
+# builder?
 mirrors:
   - name: 'docker.io'
     port: '5000'

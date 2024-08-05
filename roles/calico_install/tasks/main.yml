@@ -1,5 +1,6 @@
 ---
 - name: 'Apply calico manifests'
+  register: 'reg_calico'
   loop:
     - 'calico.yaml'
     - 'calicoctl.yaml'
@@ -7,6 +8,10 @@
     stdin: '{{ lookup("file",  relpath ~ item) }}'
   vars:
     relpath: '{{ playbook_dir }}/roles/calico_install/files/'
+    e_already: 'Error from server (AlreadyExists)'
+  failed_when:
+    - 'reg_calico.rc != 0'
+    - 'e_already not in reg_calico.stderr'
   command:
     argv:
       - '/usr/local/bin/kubectl'

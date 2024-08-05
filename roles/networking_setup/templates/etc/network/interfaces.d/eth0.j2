@@ -7,5 +7,5 @@ iface eth0 inet static
 	broadcast {{ (subnet | ipaddr(255)).split("/") | first }}
 	gateway {{ network_gateway }}
 	# dns-* options are implemented by the resolvconf package, if installed
-	dns-nameservers {{ network_gateway }} {{ extra_name_servers }}
-	dns-search {{ domain }}
+	dns-nameservers {{ extra_name_servers }}
+	dns-search svc.cluster.local

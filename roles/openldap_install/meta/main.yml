@@ -1,9 +1,10 @@
 ---
 dependencies:
   - vars:
-      repo_name: 'bitnami'
-      repo_url: 'https://charts.bitnami.com/bitnami'
-      chart_name: 'openldap'
+      # ? not official
+      repo_name: 'helm-openldap'
+      repo_url: 'https://jp-gouin.github.io/helm-openldap'
+      chart_name: 'openldap-stack-ha'
       chart_version: '{{ openldap_version }}'
       chart_namespace: '{{ openldap_namespace }}'
       chart_install_timeout: '{{ openldap_install_timeout }}'

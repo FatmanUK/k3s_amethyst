@@ -24,8 +24,8 @@
     path: '{{ helm_tarball }}'
     checksum_algorithm: 'sha256'
 
-- debug:
-    var: 'reg_checksum'
+#- debug:
+#    var: 'reg_checksum'
 
 - name: 'Download specified tarballs'
   register: 'reg_download'

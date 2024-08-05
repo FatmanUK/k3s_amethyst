@@ -1,0 +1,11 @@
+---
+- name: 'Detach node from cluster'
+  hosts: 'nodes'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'node_leave'
+...
+# vim: set filetype=yaml:

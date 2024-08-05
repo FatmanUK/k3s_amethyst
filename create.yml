@@ -2,6 +2,19 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
+# Note: for HA embedded etcd, we MUST use an odd number of master nodes.
+# https://docs.k3s.io/datastore/ha-embedded
+
+- name: 'Spread versions'
+  hosts: 'all'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    # to circumvent know bugs in libvirtd :(
+    - 'libvirtd_version_get'
+
 # useful to find "empty" files: $ find roles/ -size 35c -type f
 # useful to find actually empty files: $ find roles/ -size 0 -type f
 # useful to find empty directories: $ find roles/ -empty -type d
@@ -137,46 +150,75 @@
     - 'install_nodes'
   roles:
     - 'k3s_service_setup'
-    - role: 'k3s_generate_token'
-      when:
-        - 'is_primary'
-    - 'k3s_service_add_token'
-    - role: 'service_start'
-      vars:
-        services:
-          - 'k3s'
-# TODO: fix reboot role
-#    - role: 'host_reboot'
-#      when:
-#        - 'is_primary'
     - 'k3s_service_configure'
-#    - role: 'host_reboot'
-#      when:
-#        - 'not is_primary'
-    - 'nodes_check'
-    # TODO: add firewall check here
-    - 'calico_install'
-    - 'helm_install'
-    - 'metallb_install'
-    - 'ingress-nginx_install'
-    - 'longhorn_install'
 
-# TODO #14: continue k3s setup, metallb, etc. bootstrap and appinstall
-
-- name: 'Install apps'
+- name: 'Generate unique cluster token'
   hosts: 'primaries'
   become: yes
-  gather_facts: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  vars:
+    services:
+      - 'k3s'
+  roles:
+    - 'k3s_generate_token'
+    - 'service_enable_and_reboot'
+
+- name: 'Slurp cluster token'
+  hosts: 'secondaries:agents'
+  become: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  vars:
+    services:
+      - 'k3s'
+  roles:
+    - 'k3s_service_add_token'
+    - 'service_enable_and_reboot'
+
+- name: 'Generate API tokens'
+  hosts: 'primaries'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'nodes_check'
+    - 'k3s_apitokens_generate'
+
+- name: 'Install Calico CNI'
+  hosts: 'nodes'
+  become: no
+  gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
   tags:
     - 'nodes'
-    - 'install_apps'
+    - 'install_nodes'
   roles:
-    - 'cert-manager_install'
-#    - 'kerberos_install'
-    - 'openldap_install'
-    - 'postgresql_install'
+    - 'calico_install'
+
+- name: 'Install Helm'
+  hosts: 'primaries'
+  become: yes
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'helm_install'
+
+- name: 'Install cluster infrastructure'
+  hosts: 'primaries'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'metallb_install'
+    - 'ingress-nginx_install'
+    - 'longhorn_install'
 
 - name: 'Post-install auto-snapshot'
   hosts: 'foreman:nodes'
@@ -194,5 +236,22 @@
   roles:
     - 'snapshot_delta_commit'
     - 'snapshot_delta_create'
+
+- name: 'Install apps'
+  hosts: 'primaries'
+  become: yes
+  gather_facts: yes
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'nodes'
+    - 'install_apps'
+  roles:
+    - 'cert-manager_install'
+#    - 'kerberos_install'
+    - 'openldap_install'
+    - 'postgresql_install'
+    - 'prometheus_install'
+    - 'grafana_install'
 ...
 # vim: set filetype=yaml:

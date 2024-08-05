@@ -1,0 +1,18 @@
+---
+dependencies:
+  - vars:
+      repo_name: 'prometheus-community'
+      repo_url: 'https://prometheus-community.github.io/helm-charts'
+      chart_name: 'prometheus'
+      chart_version: '{{ prometheus_version }}'
+      chart_namespace: '{{ prometheus_namespace }}'
+      chart_install_timeout: '{{ prometheus_install_timeout }}'
+    role: 'meta_helm_chart_install'
+  - vars:
+      ingress_prefix: 'prometheus'
+      ingress_namespace: '{{ prometheus_namespace }}'
+      ingress_service: 'prometheus-server'
+      ingress_user: 'breakglassbackdoor'
+    role: 'meta_ingress_create'
+...
+# vim: set filetype=yaml:

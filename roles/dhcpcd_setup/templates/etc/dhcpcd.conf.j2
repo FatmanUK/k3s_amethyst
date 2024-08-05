@@ -15,8 +15,8 @@
 interface eth0
 	static ip_address={{ subnet | ipaddr(host_id) }}
 	static routers={{ network_gateway }}
-	static domain_name_servers={{ network_gateway }} {{ extra_name_servers }}
-	static domain_search={{ domain }}
+	static domain_name_servers={{ extra_name_servers }}
+	static domain_search=svc.cluster.local
 	noipv6
 	noipv4ll
 	nodhcp

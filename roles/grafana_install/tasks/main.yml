@@ -1,0 +1,39 @@
+---
+# hmm. not convinced this is right. TODO: check
+- name: 'Patch helm chart'
+  vars:
+    remote_helm_binary: '{{ k3s_binary_dir }}/helm'
+    chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
+  environment:
+    stdin: |
+      persistence:
+        enabled: true
+  command:
+    argv:
+      - '{{ remote_helm_binary }}'
+      - 'upgrade'
+      - '-f'
+      - '-'
+      - '--namespace'
+      - '{{ chart_namespace }}'
+      - '{{ chart_name }}'
+      - '/dev/shm/{{ chart_tarball | basename }}'
+
+- name: 'Get admin password'
+  register: 'reg_grafana_password'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'get'
+      - '--namespace'
+      - 'grafana-system'
+      - 'secret/grafana'
+      - '-o'
+      - 'jsonpath="{.data.admin-password}"'
+
+- name: 'Dump admin password to a file'
+  copy:
+    content: '{{ reg_grafana_password.stdout | b64decode }}'
+    dest: 'grafana-admin-password.txt'
+...
+# vim: set filetype=yaml:

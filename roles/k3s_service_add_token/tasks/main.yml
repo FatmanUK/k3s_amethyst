@@ -1,4 +1,15 @@
 ---
+- name: 'Read token'
+  register: 'reg_token'
+  delegate_to: '{{ groups.primaries | first }}'
+  slurp:
+    path: '/var/lib/rancher/k3s/server/token'
+
+- name: 'Set token fact'
+  run_once: yes  # spreads the token to all hosts
+  set_fact:
+    server_token: '{{ reg_token.content | b64decode }}'
+
 - name: 'Prove all can access the token'
   debug:
     var: 'server_token'
@@ -17,8 +28,6 @@
     insertafter: 'EOF'
 
 - name: 'Cycle TLS certificates directory'
-  when:
-    - 'not is_primary'
   loop:
     - 'absent'
     - 'directory'
