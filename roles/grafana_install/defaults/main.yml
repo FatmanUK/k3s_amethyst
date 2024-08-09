@@ -1,0 +1,5 @@
+---
+grafana_namespace: 'grafana-system'
+grafana_ip: '{{ subnet | ipaddr(grafana_host_id) | ipaddr("address") }}'
+...
+# vim: set filetype=yaml:

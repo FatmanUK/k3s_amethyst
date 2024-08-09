@@ -1,4 +1,21 @@
 ---
+- name: 'Unmount paths'
+  register: 'reg_unmount'
+  vars:
+    unneeded_mounts:
+      - '/usr/libexec/kubernetes'
+    e_not_mounted: 'not mounted.'
+    e_no_mount_point: 'no mount point specified.'
+  loop: '{{ unneeded_mounts }}'
+  failed_when:
+    - 'reg_unmount.rc != 0'
+    - 'e_not_mounted not in reg_unmount.stderr'
+    - 'e_no_mount_point not in reg_unmount.stderr'
+  command:
+    argv:
+      - 'umount'
+      - '{{ item }}'
+
 - name: 'Remove some filesystem paths'
   loop: '{{ unneeded_paths }}'
   file:

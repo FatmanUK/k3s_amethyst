@@ -31,18 +31,5 @@
     line: '{{ item }}'
     dest: '{{ environment_file }}'
     create: yes
-
-- name: 'Generate API tokens'
-  register: 'reg_api_tokens'
-  when:
-    - 'is_primary'
-  args:
-    stdin: '{{ lookup("template", "api_tokens.yaml.j2") }}'
-  command:
-    argv:
-      - '/usr/local/bin/kubectl'
-      - 'apply'
-      - '-f'
-      - '-'
 ...
 # vim: set filetype=yaml:

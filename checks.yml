@@ -1,6 +1,6 @@
 ---
 - name: 'Validation checks'
-  hosts: 'all'
+  hosts: 'builder'
   become: no
   gather_facts: no
   handlers:
@@ -13,17 +13,5 @@
     - 'ansible_version_check'  # not sure this is needed
     - 'ansible_vault_check'    # not sure this is needed either
     - 'builder_registry_check'
-  tasks:
-    # to circumvent know bugs in libvirtd :(
-    - name: 'Detect libvirtd version'
-      connection: 'local'
-      run_once: yes
-      set_fact:
-        libvirtd_version: '{{ lookup("lines", "libvirtd -V | cut -d\  -f3") }}'
-    - name: 'Output libvirtd version'
-      connection: 'local'
-      run_once: yes
-      debug:
-        var: 'libvirtd_version'
 ...
 # vim: set filetype=yaml:

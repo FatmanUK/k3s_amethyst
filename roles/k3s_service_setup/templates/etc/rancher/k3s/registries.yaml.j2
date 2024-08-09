@@ -1,7 +1,7 @@
 # {{ ansible_managed }}
 mirrors:
-{% for M in mirrors -%}
-  {{ M.name }}:
+{% for M in mirrors %}
+  "{{ M.name }}":
     endpoint:
       - "http://{{ network_gateway }}:{{ M.port }}"
 {% endfor -%}

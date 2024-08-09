@@ -1,4 +1,5 @@
 ---
 longhorn_namespace: 'longhorn-system'
+longhorn_ip: '{{ subnet | ipaddr(longhorn_host_id) | ipaddr("address") }}'
 ...
 # vim: set filetype=yaml:

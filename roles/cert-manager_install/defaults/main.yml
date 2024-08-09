@@ -1,4 +1,14 @@
 ---
 cert_manager_namespace: 'cert-manager-system'
+
+ca_certificate_name: 'k3s-amethyst-ca-crt'
+ca_secret_name: 'k3s-amethyst-secret'
+ca_key_algorithm: 'RSA'
+ca_key_encoding: 'PKCS1'
+ca_key_size: '2048'
+ca_duration_h: '8760'
+ca_renew_before_h: '360'
+ca_org: 'K3S Amethyst Lab'
+ca_email: 'admin@k3s.lab'
 ...
 # vim: set filetype=yaml:

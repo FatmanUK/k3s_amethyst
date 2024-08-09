@@ -23,5 +23,17 @@
     executable: '/bin/bash'
   loop: '{{ mirrors }}'
   script: '{{ argv | join(" ") }}'
+
+# can't install the rule, but can inform about it
+# needs:
+# sudo iptables -I INPUT 1 -ptcp --dport 5000:5002 -j ACCEPT
+- name: 'Test if firewall port is blocked'
+  #register: 'reg_ports_open'
+  delegate_to: '{{ groups.primaries | first }}'
+  loop: '{{ mirrors }}'
+  wait_for:
+    host: '{{ hostvars[groups.builder | first].ansible_host }}'
+    port: '{{ item.port }}'
+    timeout: 1
 ...
 # vim: set filetype=yaml:

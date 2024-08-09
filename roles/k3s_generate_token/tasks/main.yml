@@ -14,14 +14,28 @@
     executable: '/bin/bash'
   script: '{{ ([ cmd ] + args) | join(" ") }}'
 
-- name: 'Read token'
-  register: 'reg_token'
-  slurp:
-    path: '/var/lib/rancher/k3s/server/token'
-
-- name: 'Set token fact'
-  run_once: yes  # spreads the token to all hosts
-  set_fact:
-    server_token: '{{ reg_token.content | b64decode }}'
+# The service files deliberately have a line missing. It's added here.
+# TODO #24: maybe use replace instead so it's more obvious in the file?
+- name: 'Append final line to service file'
+  vars:
+    # TODO: move to group_vars?
+    k3s_service_args_list:
+      - 'server'
+      - '--disable=servicelb'
+      - '--disable=traefik'
+      - '--flannel-backend=none'
+      - '--disable-network-policy'
+      - '--cluster-cidr=192.168.0.0/16'
+      - '--write-kubeconfig-mode=0644'
+      - '--cluster-init'
+    k3s_service_args: '{{ k3s_service_args_list | join(" ") }}'
+    path_systemd: '/usr/lib/systemd/system/k3s.service'
+    path_runit: '/etc/sv/k3s/conf'
+    line_systemd: 'ExecStart=/usr/local/bin/k3s {{ k3s_service_args }}'
+    line_runit: 'OPTS="{{ k3s_service_args }}"'
+  lineinfile:
+    path: '{{ path_systemd if has_systemd else path_runit }}'
+    line: '{{ line_systemd if has_systemd else line_runit }}'
+    insertafter: 'EOF'
 ...
 # vim: set filetype=yaml:

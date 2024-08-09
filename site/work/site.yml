@@ -12,14 +12,18 @@ os_rhel:
     packages_disc_dir: '/home/adam.richardson/Downloads'
     packages_disc: '{{ packages_disc_dir }}/rhel-8.6-x86_64-dvd.iso'
   hosts:
-    k3s-mother-01:       # possibly not keeping this
+    k3s-mother-01:
       host_id: '101'
-    k3s-mother-03:       # possibly not keeping this
+    k3s-mother-02:
+      host_id: '102'
+    k3s-mother-03:
       host_id: '103'
-#      ansible_host: 'k3s-mother-03'  # debug value
-#      vm_name: 'k3s-mother-03.k3s.lab'  # debug value
-    k3s-child-01:       # possibly not keeping this
+    k3s-child-01:
       host_id: '111'
+    k3s-child-02:
+      host_id: '112'
+    k3s-child-03:
+      host_id: '113'
 
 os_voidlinux:
   hosts: { }
@@ -50,16 +54,24 @@ foreman:
     foreman_dhcp_range_end_id: '195'
     foreman_reverse_zone: '{{ subnet | reverse_zone }}'
 
+# there can be only one
 primaries:
   hosts:
     k3s-mother-01:
+  vars:
+    # in a real production environment we would be happy with 3,
+    # just don't define this (it's the default)
+    longhorn_number_of_replicas: 1
 
 secondaries:
   hosts:
+    k3s-mother-02:
     k3s-mother-03:
 
 agents:
   hosts:
     k3s-child-01:
+    k3s-child-02:
+    k3s-child-03:
 ...
 # vim: set filetype=yaml:

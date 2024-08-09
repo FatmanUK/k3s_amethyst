@@ -1,4 +1,23 @@
 ---
+is_primary: '{{ inventory_hostname in groups.primaries }}'
+is_agent: '{{ inventory_hostname in groups.agents }}'
 
+master_domain: 'https://{{ groups.primaries | first }}.{{ domain }}'
+
+master_opts:
+  - 'server'
+  - '--disable=servicelb'
+  - '--disable=traefik'
+  - '--flannel-backend=none'
+  - '--disable-network-policy'
+  - '--cluster-cidr=192.168.0.0/16'
+  - '--write-kubeconfig-mode=0644'
+  - '--cluster-init'
+agent_opts:
+  - '--server={{ master_domain }}:6443'
+  - '--token={{ server_token.strip() }}'
+
+k3s_service_opts: '{{ ["agent" if is_agent else "server"] + ([] if is_agent else master_opts) + ([] if is_primary else agent_opts) }}'
+k3s_service_opts_str: '{{ k3s_service_opts | join(" ") }}'
 ...
 # vim: set filetype=yaml:

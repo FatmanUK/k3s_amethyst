@@ -1,0 +1,10 @@
+---
+- name: 'Detect libvirtd version'
+  set_fact:
+    libvirtd_version: '{{ lookup("lines", "libvirtd -V | cut -d\  -f3") }}'
+
+- name: 'Output libvirtd version'
+  debug:
+    var: 'libvirtd_version'
+...
+# vim: set filetype=yaml:

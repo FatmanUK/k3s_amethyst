@@ -1,0 +1,13 @@
+---
+- name: 'Generate API tokens'
+  register: 'reg_api_tokens'
+  args:
+    stdin: '{{ lookup("template", "api_tokens.yaml.j2") }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'apply'
+      - '-f'
+      - '-'
+...
+# vim: set filetype=yaml:

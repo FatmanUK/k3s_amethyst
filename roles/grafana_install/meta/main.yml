@@ -1,0 +1,18 @@
+---
+dependencies:
+  - vars:
+      repo_name: 'grafana'
+      repo_url: 'https://grafana.github.io/helm-charts'
+      chart_name: 'grafana'
+      chart_version: '{{ grafana_version }}'
+      chart_namespace: '{{ grafana_namespace }}'
+      chart_install_timeout: '{{ grafana_install_timeout }}'
+    role: 'meta_helm_chart_install'
+  - vars:
+      ingress_prefix: 'grafana'
+      ingress_namespace: '{{ grafana_namespace }}'
+      ingress_service: 'grafana-frontend'
+      ingress_user: 'breakglassbackdoor'
+    role: 'meta_ingress_create'
+...
+# vim: set filetype=yaml:

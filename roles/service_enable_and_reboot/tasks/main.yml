@@ -1,0 +1,12 @@
+---
+- name: 'Reload systemd files'
+  when:
+    - 'has_systemd'
+  systemd:
+    daemon_reload: yes
+
+- name: 'Loop over services'
+  loop: '{{ services }}'
+  include_tasks: 'loop.yml'
+...
+# vim: set filetype=yaml:

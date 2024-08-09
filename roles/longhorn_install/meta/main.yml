@@ -8,5 +8,11 @@ dependencies:
       chart_namespace: '{{ longhorn_namespace }}'
       chart_install_timeout: '{{ longhorn_install_timeout }}'
     role: 'meta_helm_chart_install'
+  - vars:
+      ingress_prefix: 'longhorn'
+      ingress_namespace: '{{ longhorn_namespace }}'
+      ingress_service: 'longhorn-frontend'
+      ingress_user: 'breakglassbackdoor'
+    role: 'meta_ingress_create'
 ...
 # vim: set filetype=yaml:

@@ -2,9 +2,13 @@
 # https://t.ly/m3ZQe
 
 - name: 'Report chart name'
+  become: no
+  connection: 'local'
+  run_once: yes
   debug:
     msg: 'Installing {{ chart_name }}...'
 
+# TODO: Check if chart already exists, skip repo business if so
 # TODO: Three commands in a row, replace with script?
 # Start on builder, then go to node
 - name: 'Add helm repo'
@@ -59,12 +63,7 @@
   vars:
     e_already: 'cannot re-use a name that is still in use'
     remote_helm_binary: '{{ k3s_binary_dir }}/helm'
-    chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
-  failed_when:
-    - 'reg_install.rc != 0'
-    - 'e_already not in reg_install.stderr'
-  command:
-    argv:
+    cmd:
       - '{{ remote_helm_binary }}'
       - 'install'
       - '--namespace'
@@ -74,12 +73,11 @@
       - '--timeout={{ chart_install_timeout }}'
       - '{{ chart_name }}'
       - '/dev/shm/{{ chart_tarball | basename }}'
-
-- name: 'Delete tarball'
-  vars:
     chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
-  file:
-    path: '/dev/shm/{{ chart_tarball | basename }}'
-    state: 'absent'
+  failed_when:
+    - 'reg_install.rc != 0'
+    - 'e_already not in reg_install.stderr'
+  command:
+    argv: '{{ cmd + (chart_extra_args | default([])) }}'
 ...
 # vim: set filetype=yaml:

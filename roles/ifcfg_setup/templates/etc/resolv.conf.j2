@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
-search {{ domain }}
+search svc.cluster.local
 nameserver {{ network_gateway }}
 {% for NS in extra_name_servers.split(' ') -%}
 nameserver {{ NS }}

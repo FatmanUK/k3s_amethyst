@@ -1,0 +1,5 @@
+---
+prometheus_namespace: 'prometheus-system'
+prometheus_ip: '{{ subnet | ipaddr(prometheus_host_id) | ipaddr("address") }}'
+...
+# vim: set filetype=yaml:

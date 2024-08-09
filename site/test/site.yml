@@ -7,12 +7,14 @@ all:
     domain: 'dreamtrack.test'
     gateway_host_id: '254'
 
+# embedded etd requires odd number of master nodes,
+# or it will not be HA => at least three.
 os_voidlinux:
   hosts:
     k3s-mother-01:
       host_id: '1'
-    #k3s-mother-02:
-    #  host_id: '2'
+    k3s-mother-02:
+      host_id: '2'
     k3s-mother-03:
       host_id: '3'
     #k3s-child-01:
@@ -37,9 +39,14 @@ foreman:
 primaries:
   hosts:
     k3s-mother-01:
+  vars:
+    # in a real production environment we would be happy with 3,
+    # just don't define this (it's the default)
+    longhorn_number_of_replicas: 1
 
 secondaries:
   hosts:
+    k3s-mother-02:
     k3s-mother-03:
 
 agents:
