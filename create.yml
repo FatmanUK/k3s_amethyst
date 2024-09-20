@@ -188,18 +188,6 @@
     - 'nodes_check'
     - 'k3s_apitokens_generate'
 
-- name: 'Install Calico CNI'
-  hosts: 'nodes'
-  become: no
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  tags:
-    - 'nodes'
-    - 'install_nodes'
-  roles:
-    - 'calico_install'
-
 - name: 'Install Helm'
   hosts: 'primaries'
   become: yes
@@ -216,6 +204,7 @@
   handlers:
     - import_tasks: 'handlers/main.yml'
   roles:
+    - 'calico_install'
     - 'metallb_install'
     - 'ingress-nginx_install'
     - 'longhorn_install'

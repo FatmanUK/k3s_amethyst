@@ -23,6 +23,9 @@ longhorn_version: '1.6.2'
 longhorn_install_timeout: '30m0s'
 longhorn_host_id: '202'
 
+calico_version: 'v3.28.1'
+calico_install_timeout: '15m0s'
+
 metallb_version: '6.3.9'
 metallb_install_timeout: '15m0s'
 

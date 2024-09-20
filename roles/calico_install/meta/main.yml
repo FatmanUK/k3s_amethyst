@@ -1,0 +1,12 @@
+---
+dependencies:
+  - vars:
+      repo_name: 'projectcalico'
+      repo_url: 'https://docs.tigera.io/calico/charts'
+      chart_name: 'tigera-operator'
+      chart_version: '{{ calico_version }}'
+      chart_namespace: '{{ calico_namespace }}'
+      chart_install_timeout: '{{ calico_install_timeout }}'
+    role: 'meta_helm_chart_install'
+...
+# vim: set filetype=yaml:

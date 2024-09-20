@@ -1,4 +1,4 @@
 ---
-
+calico_namespace: 'kube-system'
 ...
 # vim: set filetype=yaml:
