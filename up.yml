@@ -19,5 +19,16 @@
           - 'virsh'
           - 'start'
           - '{{ item }}.{{ domain }}'
+
+- name: 'Start registries'
+  hosts: 'primaries'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'start'
+  roles:
+    - 'builder_registry_check'
 ...
 # vim: set filetype=yaml:
