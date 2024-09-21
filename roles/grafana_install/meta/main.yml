@@ -13,6 +13,7 @@ dependencies:
       ingress_namespace: '{{ grafana_namespace }}'
       ingress_service: 'grafana-frontend'
       ingress_user: 'breakglassbackdoor'
+      want_authentication: no
     role: 'meta_ingress_create'
 ...
 # vim: set filetype=yaml:
