@@ -105,11 +105,7 @@ unneeded_paths:
   - '/var/lib/rancher'
   - '/var/run/containerd'
 
-# These packages aren't needed on a headless server
-# "Minimal", my arse
-# apt-get purge {{ item }}
-# apt-mark manual \*  # reject autoremove suggestions
-# TODO: there's no use for this yet, add a role
+# TODO #46: there's no use for this yet, add a role
 xubuntu_remove_package_globs:
   - 'alsa*'
   - 'cloud*'
