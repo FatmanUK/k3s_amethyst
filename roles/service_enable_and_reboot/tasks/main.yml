@@ -8,5 +8,8 @@
 - name: 'Loop over services'
   loop: '{{ services }}'
   include_tasks: 'loop.yml'
+
+- name: 'Reboot'
+  reboot:
 ...
 # vim: set filetype=yaml:

@@ -38,8 +38,5 @@
     name: '{{ item }}'
     #enabled: yes  # apparently, doesn't work
     state: 'started'
-
-- name: 'Reboot'
-  reboot:
 ...
 # vim: set filetype=yaml:
