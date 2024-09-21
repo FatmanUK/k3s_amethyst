@@ -1,4 +1,5 @@
 ---
-
+chart_extra_args: []
+chart_values_template: ''
 ...
 # vim: set filetype=yaml:
