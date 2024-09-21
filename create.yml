@@ -129,6 +129,7 @@
     - 'nodes'
     - 'prepare_nodes'
   roles:
+    - 'limits_setup'
     - 'sysctl_setup'
     - 'swap_disable'
     - 'iscsi_setup'
@@ -196,6 +197,7 @@
     - import_tasks: 'handlers/main.yml'
   roles:
     - 'helm_install'
+    - 'coredns_patch'
 
 - name: 'Install cluster infrastructure'
   hosts: 'primaries'

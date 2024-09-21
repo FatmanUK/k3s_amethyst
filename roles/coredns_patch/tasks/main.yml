@@ -1,0 +1,14 @@
+---
+# TODO: seems like this could be meta'd
+# Think this is a patch rather than an apply
+- name: 'Apply manifest'
+  environment:
+    stdin: '{{ lookup("template", "coredns-increase-mem.yml.j2") }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'patch'
+      - '-f'
+      - '-'
+...
+# vim: set filetype=yaml:
