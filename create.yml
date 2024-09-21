@@ -239,9 +239,9 @@
     - 'install_apps'
   roles:
     - 'cert-manager_install'
-#    - 'kerberos_install'
     - 'benthos_install'
     - 'vault_install'
+    - 'kerberos_install'
     - 'openldap_install'
     - 'postgresql_install'
     - 'prometheus_install'
