@@ -1,0 +1,32 @@
+---
+is_clobbering_time: yes
+
+k3s_clobber_files_common:
+  - '/etc/rancher'
+  - '/etc/cni'
+  - '/etc/iscsi'
+  - '/etc/k3s-token'
+  - '/etc/sv/kube-ui'
+  - '/usr/local/bin/kubectl'
+  - '/usr/local/bin/crictl'
+  - '/usr/local/bin/ctr'
+  - '/usr/libexec/kubernetes'
+  - '/run/k3s'
+  - '/run/flannel'
+  - '/var/lib/rancher'
+  - '/var/lib/kubelet'
+  - '/var/lib/calico'
+  - '/var/lib/cni'
+  - '/var/lib/longhorn'
+  - '/var/lib/nfs'
+  - '/var/service/kube-ui'
+  - '/var/service/keepalived'
+  - '/usr/local/bin/k3s-killall.sh'
+  - '/usr/local/bin/k3s-uninstall.sh'
+  - '/usr/local/bin/calicoctl'
+  - '/usr/local/bin/k3s'
+  - '/usr/local/bin/k3s.bak'
+  - '/home/ansible/manifests'
+  - '/home/ansible/.kube'
+...
+# vim: set filetype=yaml:
