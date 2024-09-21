@@ -23,14 +23,13 @@
 # see roles/foreman_setup/templates/vmspec.xml.j2 (might be symlinks
 # from other roles?)
 
-- name: 'Basic setup of nodes and Foreman host'
-  hosts: 'foreman:nodes'
+- name: 'Basic setup of nodes'
+  hosts: 'nodes'
   become: yes
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
   tags:
-    - 'foreman'
     - 'nodes'
   roles:
     - role: 'xbps_setup'
@@ -94,17 +93,17 @@
     #- 'do_nothing'
     #- 'fail_egregiously'
 
-- name: 'Prepare Foreman'
-  hosts: 'foreman'
-  become: yes
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  tags:
-    - 'foreman'
-    - 'never'  # remove 'never' when foreman_setup role is bulletproof
-  roles:
-    - 'foreman_setup'
+#- name: 'Prepare Foreman'
+#  hosts: 'foreman'
+#  become: yes
+#  gather_facts: no
+#  handlers:
+#    - import_tasks: 'handlers/main.yml'
+#  tags:
+#    - 'foreman'
+#    - 'never'  # remove 'never' when foreman_setup role is bulletproof
+#  roles:
+#    - 'foreman_setup'
 
 - name: 'Prepare builder'
   hosts: 'builder'
