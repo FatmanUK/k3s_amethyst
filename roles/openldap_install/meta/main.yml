@@ -8,6 +8,29 @@ dependencies:
       chart_version: '{{ openldap_version }}'
       chart_namespace: '{{ openldap_namespace }}'
       chart_install_timeout: '{{ openldap_install_timeout }}'
+      chart_extra_args:
+        - '-f'
+        - 'my-ldap-values.yaml'
+        #- '--set'
+        #- 'global.ldapDomain=k3s.lab'
+        #- '--set'
+        #- 'global.adminUser=director'
+        #- '--set'
+        #- 'global.adminPassword=blargh'
     role: 'meta_helm_chart_install'
+  - vars:
+      ingress_prefix: 'openldap-passwd'
+      ingress_namespace: '{{ openldap_namespace }}'
+      ingress_service: 'openldap-stack-ha-ltb-passwd'
+      ingress_user: 'backdoor'
+      secret_name: 'basic-auth-passwd'
+    role: 'meta_ingress_create'
+  - vars:
+      ingress_prefix: 'openldap-admin'
+      ingress_namespace: '{{ openldap_namespace }}'
+      ingress_service: 'openldap-stack-ha-phpldapadmin'
+      ingress_user: 'backdoor'
+      secret_name: 'basic-auth-admin'
+    role: 'meta_ingress_create'
 ...
 # vim: set filetype=yaml:
