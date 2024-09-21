@@ -238,6 +238,7 @@
   roles:
     - 'cert-manager_install'
 #    - 'kerberos_install'
+    - 'vault_install'
     - 'openldap_install'
     - 'postgresql_install'
     - 'prometheus_install'

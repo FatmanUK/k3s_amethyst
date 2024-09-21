@@ -53,6 +53,10 @@ grafana_version: '8.4.1'
 grafana_install_timeout: '10m0s'
 grafana_host_id: '204'
 
+vault_version: '0.28.1'  # chart is this, app is 1.17.2
+vault_namespace: 'vault-system'
+vault_install_timeout: '10m0s'
+
 # There should be a better way than this!
 host_entries: '{%
   set he = [] %}{%
