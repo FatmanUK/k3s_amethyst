@@ -11,5 +11,7 @@
 
 - name: 'Reboot'
   reboot:
+    # workaround for really weird bug
+    reboot_command: 'reboot'
 ...
 # vim: set filetype=yaml:
