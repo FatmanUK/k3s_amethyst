@@ -1,14 +1,24 @@
 ---
 # TODO: seems like this could be meta'd
-# Think this is a patch rather than an apply
-- name: 'Apply manifest'
-  environment:
-    stdin: '{{ lookup("template", "coredns-increase-mem.yml.j2") }}'
-  command:
-    argv:
-      - '/usr/local/bin/kubectl'
-      - 'patch'
-      - '-f'
-      - '-'
+
+# broken, don't know how to fix
+- name: 'Patch CoreDNS'
+  vars:
+    patch_file: '/dev/shm/coredns-increase-mem.yml'
+  block:
+    - name: 'Copy patch'
+      loop:
+        - '{{ patch_file }}'
+      template:
+        src: '{{ item[1:] }}.j2'
+        dest: '{{ item }}'
+
+#    # Think this is a patch rather than an apply
+#    - name: 'Patch manifest'
+#      command:
+#        argv:
+#          - '/usr/local/bin/kubectl'
+#          - 'patch'
+#          - '--patch-file={{ patch_file }}'
 ...
 # vim: set filetype=yaml:
