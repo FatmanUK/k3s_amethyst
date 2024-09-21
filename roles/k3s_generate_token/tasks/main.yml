@@ -18,7 +18,7 @@
 # TODO #24: maybe use replace instead so it's more obvious in the file?
 - name: 'Append final line to service file'
   vars:
-    # TODO: move to group_vars?
+    # TODO #27: move to group_vars?
     k3s_service_args_list:
       - 'server'
       - '--disable=servicelb'
