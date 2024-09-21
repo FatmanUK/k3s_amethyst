@@ -83,7 +83,7 @@
       - '/dev/shm/{{ chart_tarball | basename }}'
     chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
     chart_values:
-      - '{{ ("--values=/dev/shm/" ~ chart_values_template) if chart_values_template != "" }}'
+      - '{{ ("--values=/dev/shm/" ~ chart_values_template) if chart_values_template != "" else [] }}'
   failed_when:
     - 'reg_install.rc != 0'
     - 'e_already not in reg_install.stderr'
