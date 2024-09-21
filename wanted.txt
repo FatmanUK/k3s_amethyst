@@ -1,0 +1,9 @@
+
+want Elastic
+don't want Foreman (separate system for that)
+want Kibana
+want Gitea (or Gitlab)
+want Buildbot
+
+maybe Confluence/Jira? Free tier?
+
