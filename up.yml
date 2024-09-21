@@ -10,7 +10,16 @@
   tags:
     - 'start'
   tasks:
-    - loop: '{{ groups.all | difference(groups.builder) }}'
+    - register: 'reg_start'
+      vars:
+        e_already: 'Domain is already active'
+      loop: '{{ groups.all | difference(groups.builder) }}'
+      changed_when:
+        - 'reg_start.rc == 0'
+        - 'e_already not in reg_start.stderr'
+      failed_when:
+        - 'reg_start.rc != 0'
+        - 'e_already not in reg_start.stderr'
       command:
         argv:
           - 'virsh'
