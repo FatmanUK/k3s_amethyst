@@ -13,5 +13,6 @@
   reboot:
     # workaround for really weird bug
     reboot_command: 'reboot'
+    post_reboot_delay: 10
 ...
 # vim: set filetype=yaml:
