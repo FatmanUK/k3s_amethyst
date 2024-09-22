@@ -1,5 +1,7 @@
 ---
 chart_extra_args: []
 chart_values_template: ''
+
+chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
 ...
 # vim: set filetype=yaml:

@@ -50,8 +50,6 @@
           - '{{ repo_name }}/{{ chart_name }}'
 
 - name: 'Copy in helm chart'
-  vars:
-    chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
   copy:
     src: '{{ chart_tarball }}'
     dest: '{{ blob_tmp_dir }}/'
@@ -81,9 +79,10 @@
     cmd_2:
       - '{{ chart_name }}'
       - '/dev/shm/{{ chart_tarball | basename }}'
-    chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
-    chart_values:
-      - '{{ ("--values=/dev/shm/" ~ chart_values_template) if chart_values_template != "" else [] }}'
+    null_list: []
+    values_param:
+      - '--values=/dev/shm/{{ chart_values_template }}'
+    chart_values: '{{ values_param if chart_values_template != "" else null_list }}'
   failed_when:
     - 'reg_install.rc != 0'
     - 'e_already not in reg_install.stderr'
