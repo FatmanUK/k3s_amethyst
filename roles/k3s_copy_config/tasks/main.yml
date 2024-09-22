@@ -1,0 +1,13 @@
+---
+- name: 'Copy kube config to builder'
+  fetch:
+    src: '/etc/rancher/k3s/k3s.yaml'
+    dest: '~/.kube/config'
+    flat: yes
+
+- name: 'Modify kube config'
+  replace:
+    regexp: '^    server: https://127.0.0.1:6443$'
+    line: '    server: https://{{ ansible_host }}:6443'
+...
+# vim: set filetype=yaml:
