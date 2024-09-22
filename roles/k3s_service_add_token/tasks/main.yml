@@ -11,6 +11,7 @@
     server_token: '{{ reg_token.content | b64decode }}'
 
 - name: 'Prove all can access the token'
+  no_log: yes
   debug:
     var: 'server_token'
 
