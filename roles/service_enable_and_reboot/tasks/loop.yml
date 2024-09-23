@@ -31,6 +31,7 @@
 #    #enabled: yes  # apparently, doesn't work
 #    state: 'enabled'
 
+# TODO: possibly add retries?
 - name: 'Start systemd service'
   when:
     - 'has_systemd'
