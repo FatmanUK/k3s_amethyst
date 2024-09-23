@@ -5,6 +5,8 @@
 # Note: for HA embedded etcd, we MUST use an odd number of master nodes.
 # https://docs.k3s.io/datastore/ha-embedded
 
+# Work: while on libvirt8, run with "--skip-tags=broken_on_libvirt_8"
+
 - name: 'Spread versions'
   hosts: 'all'
   become: no

@@ -123,6 +123,8 @@
     # TODO #21: fix this properly!
     # This is a poor workaround for the 'python3-apt must be installed and visible from /usr/bin/python3' bug
     - 'not has_apt'
+  tags:
+    - 'broken_on_libvirt_8'
   package:
     use: '{{ package_manager }}'
     update_cache: true  # not doc'd, but stackoverflow says it works
