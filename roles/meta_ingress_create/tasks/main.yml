@@ -60,9 +60,12 @@
           - '{{ secret_name }}'
           - '--from-literal=auth={{ user }}:{{ reg_pw_hash.stdout }}'
 
+    - name: 'Template ingress'
+      template:
+        src: 'ingress.yaml.j2'
+        dest: '/dev/shm/ingress.yaml'
+
     - name: 'Create ingress'
-      args:
-        stdin: '{{ lookup("template", "ingress.yaml.j2") }}'
       command:
         argv:
           - '/usr/local/bin/kubectl'
@@ -70,6 +73,6 @@
           - '-n'
           - '{{ ingress_namespace }}'
           - '-f'
-          - '-'
+          - '/dev/shm/ingress.yaml'
 ...
 # vim: set filetype=yaml:
