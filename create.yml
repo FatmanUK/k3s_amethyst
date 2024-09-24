@@ -239,14 +239,13 @@
     - 'longhorn_install'
 
 - name: 'Post-install auto-snapshot'
-  hosts: 'foreman:nodes'
+  hosts: 'nodes'
   connection: 'local'
   become: no
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
   tags:
-    - 'foreman'
     - 'nodes'
     - 'snapshot'
   vars:
