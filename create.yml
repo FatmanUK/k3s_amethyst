@@ -219,6 +219,20 @@
     - import_tasks: 'handlers/main.yml'
   roles:
     - 'calico_install'
+# TODO: wait for nodes to be up
+# Wait for these too:
+
+# deployments:
+#calico-system   calico-kube-controllers
+#calico-system   calico-typha
+#kube-system     coredns
+#kube-system     local-path-provisioner
+#kube-system     metrics-server
+#kube-system     tigera-operator
+# pods (optional):
+#kube-system      local-path-provisioner-6c86858495-4fg7j
+#kube-system      metrics-server-54fd9b65b-hftf9
+
     - 'metallb_install'
     - 'ingress-nginx_install'
     - 'cert-manager_install'
