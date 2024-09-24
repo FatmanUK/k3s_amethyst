@@ -221,6 +221,7 @@
     - 'calico_install'
     - 'metallb_install'
     - 'ingress-nginx_install'
+    - 'cert-manager_install'
     - 'longhorn_install'
 
 - name: 'Post-install auto-snapshot'
@@ -250,7 +251,6 @@
     - 'nodes'
     - 'install_apps'
   roles:
-    - 'cert-manager_install'
     - 'benthos_install'
     - 'vault_install'
     - 'kerberos_install'
