@@ -182,7 +182,6 @@
 
 - name: 'Copy kube config to builder'
   hosts: 'primaries'
-  connection: 'local'
   run_once: yes
   become: no
   gather_facts: no
