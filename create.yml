@@ -210,6 +210,19 @@
     - 'helm_install'
     - 'coredns_patch'
 
+#No scheduling on control planes:
+#kubectl taint node k3s-mother-0?.k3s.lab k3s-controlplane=true:NoSchedule
+#
+#Except local-path, coredns and metrics server:
+#Edit deployments/local-path-provisioner,
+#deployments/coredns,
+#deployments/metrics-server
+#      tolerations:
+#      - effect: NoExecute
+#        operator: Exists
+#      - effect: NoSchedule
+#        operator: Exists
+
 - name: 'Install cluster infrastructure'
   hosts: 'primaries'
   become: no
