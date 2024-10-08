@@ -22,6 +22,6 @@
         state: 'link'
         force: yes
         src: '{{ conf_file }}'
-        dest: '/home/adam.richardson/.kube/config'
+        dest: '~/.kube/config'
 ...
 # vim: set filetype=yaml:
