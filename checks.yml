@@ -1,6 +1,6 @@
 ---
 - name: 'Validation checks'
-  hosts: 'builder'
+  hosts: 'primaries'
   become: no
   gather_facts: no
   handlers:

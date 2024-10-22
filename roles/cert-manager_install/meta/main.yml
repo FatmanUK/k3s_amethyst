@@ -8,7 +8,8 @@ dependencies:
       chart_namespace: '{{ cert_manager_namespace }}'
       chart_install_timeout: '{{ cert_manager_install_timeout }}'
       chart_extra_args:
-        - '--set installCRDs=true'
+        - '--set'
+        - 'installCRDs=true'
     role: 'meta_helm_chart_install'
 ...
 # vim: set filetype=yaml:

@@ -14,5 +14,9 @@ sysctl_settings:
     value: '1'
   - key: 'net.ipv6.conf.default.disable_ipv6'
     value: '1'
+  - key: 'vm.swappiness'
+    value: '0'
+  - key: 'kernel.printk'
+    value: '0	0	0	0'
 ...
 # vim: set filetype=yaml:

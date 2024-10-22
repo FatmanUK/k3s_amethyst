@@ -1,0 +1,8 @@
+---
+dependencies:
+  - vars:
+      configs:
+        - '/etc/security/limits.conf'
+    role: 'meta_rootfile_template'
+...
+# vim: set filetype=yaml:

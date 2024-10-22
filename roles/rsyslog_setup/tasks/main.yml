@@ -1,4 +1,35 @@
 ---
+# TODO #49: make script (multiple consecutive command tasks)
+# TODO: Also not sure this belongs here
+- name: 'Stop sending kernel logs to console'
+  command:
+    argv:
+      - 'sysctl'
+      - 'kernel.printk="0	0	0	0"'
+
+# Normalise all the rsyslog services
+- name: 'Disable duplicate services'
+  register: 'reg_systemd_disable'
+  when:
+    - 'has_systemd'
+  vars:
+    e_not_found: 'Could not find the requested service'
+    e_not_loaded: 'Unit rsyslogd.service not loaded'
+    e_not_exist: 'does not exist.'
+  loop:
+    - 'rsyslogd'
+  # doesn't seem doable with systemd module
+  failed_when:
+    - 'reg_systemd_disable.rc != 0'
+    - 'e_not_found not in reg_systemd_disable.stderr'
+    - 'e_not_loaded not in reg_systemd_disable.stderr'
+    - 'e_not_exist not in reg_systemd_disable.stderr'
+  command:
+    argv:
+      - 'systemctl'
+      - 'disable'
+      - '{{ item }}'
+
 # Normalise all the rsyslog services
 - name: 'Stop duplicate services'
   register: 'reg_systemd'

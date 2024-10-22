@@ -3,45 +3,52 @@
 # 1. set up hostname outside the cluster - DNS or hosts file
 # 2. copy the k3s-ca.crt outside and install in browsers
 
-# TODO: make script?
+# TODO #49: make script?
 - name: 'Set up ingress'
   vars:
-    ingress_yaml: |
-      apiVersion: networking.k8s.io/v1
-      kind: Ingress
-      metadata:
-        name: {{ ingress_prefix }}-ingress
-        namespace: {{ ingress_namespace }}
-        annotations:
-          cert-manager.io/cluster-issuer: {{ certificate_issuer }}
-          nginx.ingress.kubernetes.io/auth-type: basic
-          nginx.ingress.kubernetes.io/ssl-redirect: 'false'
-          nginx.ingress.kubernetes.io/auth-secret: basic-auth
-          nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required'
-      spec:
-        ingressClassName: nginx
-        tls:
-        - hosts:
-          - {{ ingress_prefix }}.{{ domain }}
-          secretName: {{ ingress_prefix }}-tls
-        rules:
-        - host: {{ ingress_prefix }}.{{ domain }}
-          http:
-            paths:
-            - pathType: Prefix
-              path: "/"
-              backend:
-                service:
-                  name: {{ ingress_service }}
-                  port:
-                    number: 80
     user: '{{ ingress_user }}'
-    password: '{{ lookup("password", "/dev/null", length=16) }}'
+    pw_file: '{{ ingress_prefix }}-{{ user }}-password.txt'
+    # password lookup doesn't work consistently
+    #password: '{{ lookup("password", pw_file, length=16) }}'
   block:
-    # Hmm --- secret needs a data.auth section? TODO: verify this, do if so
+    - name: 'Remove old password files'
+      file:
+        path: '{{ pw_file }}'
+        state: 'absent'
+
+    - name: 'Generate password'
+      register: 'reg_gen_pw'
+      command:
+        argv:
+          - 'uuidgen'
+
+    - name: 'Write password file'
+      copy:
+        content: '{{ reg_gen_pw.stdout }}'
+        dest: '{{ pw_file }}'
+
+    # HTTP Basic Auth only supports bcrypt, apr1, sha1 or local crypt.
+    # Basic Auth is kinda old and crappy.
+    - name: 'Hash password'
+      register: 'reg_pw_hash'
+      vars:
+        # TODO: improve this: it's a pepper currently
+        salt: 'potatoes'
+      command:
+        argv:
+          - 'openssl'
+          - 'passwd'
+          - '-salt={{ salt }}'
+          - '-apr1'
+          - '{{ reg_gen_pw.stdout }}'
+
     - name: 'Create secret'
-      environment:
-        stdin: '{{ user }}:{{ password | password_hash("sha256") }}'
+      register: 'reg_secret'
+      vars:
+        e_already: 'already exists'
+      failed_when:
+        - 'reg_secret.rc != 0'
+        - 'e_already not in reg_secret.stderr'
       command:
         argv:
           - '/usr/local/bin/kubectl'
@@ -50,13 +57,15 @@
           - '{{ ingress_namespace }}'
           - 'secret'
           - 'generic'
-          - 'basic-auth'
-          - '-f'
-          - '-'
+          - '{{ secret_name }}'
+          - '--from-literal=auth={{ user }}:{{ reg_pw_hash.stdout }}'
+
+    - name: 'Template ingress'
+      template:
+        src: 'ingress.yaml.j2'
+        dest: '/dev/shm/ingress.yaml'
 
     - name: 'Create ingress'
-      environment:
-        stdin: '{{ ingress_yaml }}'
       command:
         argv:
           - '/usr/local/bin/kubectl'
@@ -64,11 +73,6 @@
           - '-n'
           - '{{ ingress_namespace }}'
           - '-f'
-          - '-'
-
-    - name: 'Output password'
-      copy:
-        content: '{{ password }}'
-        dest: '{{ ingress_prefix }}-{{ user }}-password.txt'
+          - '/dev/shm/ingress.yaml'
 ...
 # vim: set filetype=yaml:

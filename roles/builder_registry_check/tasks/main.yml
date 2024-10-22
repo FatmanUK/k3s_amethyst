@@ -1,35 +1,45 @@
 ---
 - name: 'Pull registry image'
+  register: 'reg_pull'
   connection: 'local'
   run_once: yes
   vars:
+    e_already: 'Image already exists'
     argv:
       - 'scripts/podman_check_pull.bash'
       - 'registry:{{ registry_tag }}'
+  changed_when:
+    - 'reg_pull.rc == 0'
+    - 'e_already not in reg_pull.stderr'
   args:
     executable: '/bin/bash'
   script: '{{ argv | join(" ") }}'
 
 - name: 'Start registry container'
+  register: 'reg_start'
   connection: 'local'
   run_once: yes
   vars:
+    e_already: 'Already running'
     argv:
       - 'scripts/registry_start_run.bash'
       - '{{ registry_tag }}'
       - '{{ item.name }}'
       - '{{ item.port }}'
+  changed_when:
+    - 'reg_start.rc == 0'
+    - 'e_already not in reg_start.stderr'
   args:
     executable: '/bin/bash'
   loop: '{{ mirrors }}'
   script: '{{ argv | join(" ") }}'
 
 # can't install the rule, but can inform about it
+# $ ansible -i site/<site> -mwait_for -a 'host=10.20.0.253 port=5000 timeout=1' k3s-mother-01
 # needs:
 # sudo iptables -I INPUT 1 -ptcp --dport 5000:5002 -j ACCEPT
 - name: 'Test if firewall port is blocked'
-  #register: 'reg_ports_open'
-  delegate_to: '{{ groups.primaries | first }}'
+  #delegate_to: '{{ groups.primaries | first }}'
   loop: '{{ mirrors }}'
   wait_for:
     host: '{{ hostvars[groups.builder | first].ansible_host }}'

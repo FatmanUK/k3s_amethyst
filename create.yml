@@ -2,8 +2,10 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
-# Note: for HA embedded etcd, we MUST use an odd number of master nodes.
+# Note: for HA embedded etcd, we MUST use an odd number of master nodes (also, at least 3).
 # https://docs.k3s.io/datastore/ha-embedded
+
+# Work: while on libvirt8, run with "--skip-tags=broken_on_libvirt_8"
 
 - name: 'Spread versions'
   hosts: 'all'
@@ -23,44 +25,57 @@
 # see roles/foreman_setup/templates/vmspec.xml.j2 (might be symlinks
 # from other roles?)
 
-- name: 'Basic setup of nodes and Foreman host'
-  hosts: 'foreman:nodes'
+- name: 'Basic setup of nodes'
+  hosts: 'nodes'
   become: yes
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
   tags:
-    - 'foreman'
     - 'nodes'
   roles:
     - role: 'xbps_setup'
       when:
         - 'has_xbps'
+    # Ubuntu libvirtd has bugs :(
     - role: 'yum_setup'
       when:
         - 'has_yum'
+        - 'libvirtd_version is version("9.0", ">")'
     - role: 'apt_setup'
       when:
         - 'has_apt'
-    - 'rsyslog_setup'
+    - role: 'rsyslog_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'service_start'
       vars:
         services:
           - 'rsyslog'
-    - 'logrotate_setup'
+    - role: 'logrotate_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - 'openssh_server_setup'
     - role: 'selinux_setup'
       when:
         - 'mandatory_access_control == "selinux"'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'apparmor_setup'
       when:
         - 'mandatory_access_control == "apparmor"'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - 'grub_setup'
     - 'services_tidy'
     - 'files_tidy'
     - role: 'iptables_setup'
       when:
         - 'has_iptables'  # is this right? maybe redesign this role
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'service_start'
       when:
         - 'has_iptables'
@@ -84,7 +99,12 @@
       when:
         - 'not has_dhcpcd'
         - 'not has_sysconfig'
-    - 'chrony_setup'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
+    - role: 'chrony_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
 # Ubuntu hates chrony apparently?
 # TODO #13: fix
 #    - role: 'service_start'
@@ -94,17 +114,17 @@
     #- 'do_nothing'
     #- 'fail_egregiously'
 
-- name: 'Prepare Foreman'
-  hosts: 'foreman'
-  become: yes
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  tags:
-    - 'foreman'
-    - 'never'  # remove 'never' when foreman_setup role is bulletproof
-  roles:
-    - 'foreman_setup'
+#- name: 'Prepare Foreman'
+#  hosts: 'foreman'
+#  become: yes
+#  gather_facts: no
+#  handlers:
+#    - import_tasks: 'handlers/main.yml'
+#  tags:
+#    - 'foreman'
+#    - 'never'  # remove 'never' when foreman_setup role is bulletproof
+#  roles:
+#    - 'foreman_setup'
 
 - name: 'Prepare builder'
   hosts: 'builder'
@@ -129,6 +149,7 @@
     - 'nodes'
     - 'prepare_nodes'
   roles:
+    - 'limits_setup'
     - 'sysctl_setup'
     - 'swap_disable'
     - 'iscsi_setup'
@@ -178,36 +199,47 @@
     - 'k3s_service_add_token'
     - 'service_enable_and_reboot'
 
-- name: 'Generate API tokens'
+- name: 'Copy kube config to builder'
+  hosts: 'primaries'
+  run_once: yes  # note! run_once
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  roles:
+    - 'k3s_copy_config'
+
+- name: 'Configuration'
   hosts: 'primaries'
   become: no
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
+  vars:
+    patches:  # for kubectl_patch
+      - file: 'coredns-memory'
+        kind: 'deployments.app'
+        name: 'coredns'
+        namespace: 'kube-system'
   roles:
     - 'nodes_check'
     - 'k3s_apitokens_generate'
-
-- name: 'Install Calico CNI'
-  hosts: 'nodes'
-  become: no
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  tags:
-    - 'nodes'
-    - 'install_nodes'
-  roles:
+    - role: 'helm_install'
+      become: yes
+    - 'kubectl_patch'
     - 'calico_install'
 
-- name: 'Install Helm'
-  hosts: 'primaries'
-  become: yes
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  roles:
-    - 'helm_install'
+# TODO?: No scheduling on control planes (except local-path, coredns and metrics server):
+# kubectl taint node k3s-mother-0?.k3s.lab k3s-controlplane=true:NoSchedule
+
+# Edit deployments/local-path-provisioner,
+# deployments/coredns,
+# deployments/metrics-server
+#      tolerations:
+#      - effect: NoExecute
+#        operator: Exists
+#      - effect: NoSchedule
+#        operator: Exists
 
 - name: 'Install cluster infrastructure'
   hosts: 'primaries'
@@ -216,19 +248,33 @@
   handlers:
     - import_tasks: 'handlers/main.yml'
   roles:
+# TODO: wait for nodes to be up
+# Wait for these too:
+
+# deployments:
+#calico-system   calico-kube-controllers
+#calico-system   calico-typha
+#kube-system     coredns
+#kube-system     local-path-provisioner
+#kube-system     metrics-server
+#kube-system     tigera-operator
+# pods (optional):
+#kube-system      local-path-provisioner-6c86858495-4fg7j
+#kube-system      metrics-server-54fd9b65b-hftf9
+
     - 'metallb_install'
     - 'ingress-nginx_install'
+    - 'cert-manager_install'
     - 'longhorn_install'
 
 - name: 'Post-install auto-snapshot'
-  hosts: 'foreman:nodes'
+  hosts: 'nodes'
   connection: 'local'
   become: no
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
   tags:
-    - 'foreman'
     - 'nodes'
     - 'snapshot'
   vars:
@@ -247,11 +293,14 @@
     - 'nodes'
     - 'install_apps'
   roles:
-    - 'cert-manager_install'
-#    - 'kerberos_install'
+    - 'benthos_install'
+    #- do_nothing
+    - 'vault_install'
+    #- fail_egregiously
+    - 'kerberos_install'
     - 'openldap_install'
     - 'postgresql_install'
     - 'prometheus_install'
     - 'grafana_install'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

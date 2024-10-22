@@ -4,7 +4,7 @@
     path: '{{ helm_tarball | dirname }}'
     state: 'directory'
 
-# similar to meta_download_compress. TODO: Meta this as meta_download?
+# similar to meta_download_compress. TODO #48: Meta this as meta_download?
 #- name: 'Check if tarball exists already'
 #  register: 'reg_tarball'
 #  connection: 'local'

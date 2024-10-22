@@ -1,0 +1,11 @@
+---
+dependencies:
+  - vars:
+      ingress_prefix: 'benthos'
+      ingress_namespace: '{{ benthos_namespace }}'
+      ingress_service: 'benthos-service'
+      ingress_user: 'benthosuser'
+      ingress_service_port: '4195'
+    role: 'meta_ingress_create'
+...
+# vim: set filetype=yaml:

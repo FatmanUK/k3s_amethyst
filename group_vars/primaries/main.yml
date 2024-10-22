@@ -1,5 +1,9 @@
 ---
 ca_certificate_issuer: 'selfsigned-issuer'
 certificate_issuer: 'k3s-amethyst-issuer'
+
+coredns_limit_mem_mb: '600'
+coredns_request_mem_mb: '370'
+coredns_replicas: '3'
 ...
 # vim: set filetype=yaml:

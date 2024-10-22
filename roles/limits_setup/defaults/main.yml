@@ -1,0 +1,5 @@
+---
+limit_soft_number_files: '16384'
+limit_hard_number_files: '16384'
+...
+# vim: set filetype=yaml:
