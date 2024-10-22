@@ -1,0 +1,91 @@
+---
+# https://t.ly/m3ZQe
+
+- name: 'Report chart name'
+  become: no
+  connection: 'local'
+  run_once: yes
+  debug:
+    var: 'chart_name'
+
+# TODO #52: Check if chart already exists, skip repo business if so
+# TODO #49: Three commands in a row, replace with script?
+# Start on builder, then go to node
+- name: 'Add helm repo'
+  become: no
+  connection: 'local'
+  run_once: yes
+  vars:
+    e_already_repo: 'already exists, please specify a different name'
+    e_already: 'already exists with the same configuration'
+    local_helm_binary: '/usr/sbin/helm'
+  environment:
+    NO_PROXY: '*'
+  block:
+    - name: 'Add helm repo'
+      register: 'reg_add_repo'
+      changed_when:
+        - 'reg_add_repo.rc == 0'
+        - 'e_already_repo not in reg_add_repo.stderr'
+      failed_when:
+        - 'reg_add_repo.rc != 0'
+        - 'e_already_repo not in reg_add_repo.stderr'
+      command:
+        argv:
+          - '{{ local_helm_binary }}'
+          - 'repo'
+          - 'add'
+          - '{{ chart_repo_name }}'
+          - '{{ chart_repo_url }}'
+
+# commented while debugging as it's long
+#    - name: 'Update helm repo state'
+#      command:
+#        argv:
+#          - '{{ local_helm_binary }}'
+#          - 'repo'
+#          - 'update'
+
+- name: 'Template in values file'
+  when:
+    - 'chart_values != ""'
+  become: no
+  connection: 'local'
+  run_once: yes
+  template:
+    src: '{{ chart_values }}.j2'
+    dest: '/dev/shm/{{ chart_values }}'
+
+- name: 'Install helm chart'
+  register: 'reg_chart_install'
+  become: no
+  connection: 'local'
+  run_once: yes
+  changed_when:
+    - 'reg_chart_install.rc == 0'
+    - 'e_already not in reg_chart_install.stderr'
+  failed_when:
+    - 'reg_chart_install.rc != 0'
+    - 'e_already not in reg_chart_install.stderr'
+  vars:
+    e_already: 'exists and cannot be imported'
+    local_helm_binary: '/usr/sbin/helm'
+    common_prefix:
+      - '{{ local_helm_binary }}'
+      - 'install'
+      - '--namespace'
+      - '{{ chart_namespace }}'
+      - '--create-namespace'
+      - '--generate-name'
+      - '--atomic'
+      - '--timeout={{ chart_install_timeout }}'
+      - '--version={{ chart_version }}'
+      - '{{ chart_repo_name }}/{{ chart_name }}'
+    val_flag: '--values=/dev/shm/{{ chart_values }}'
+    extra_argv: '{{ chart_extra_args.split(" ") | list }}'
+  command:
+    argv: '{{ common_prefix
+              + ([ val_flag ] if chart_values != "" else [])
+              + (extra_argv if chart_extra_args != "" else []) }}'
+...
+# vim: set filetype=yaml

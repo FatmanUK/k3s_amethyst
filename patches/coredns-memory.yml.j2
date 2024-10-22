@@ -1,0 +1,19 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  namespace: kube-system
+spec:
+  replicas: {{ coredns_replicas }}
+  template:
+    spec:
+      containers:
+      - name: coredns
+        resources:
+          limits:
+            memory: {{ coredns_limit_mem_mb }}Mi
+          requests:
+            memory: {{ coredns_request_mem_mb }}Mi
+...
+# vim: set filetype=yaml

@@ -35,6 +35,7 @@
 - name: 'Start systemd service'
   when:
     - 'has_systemd'
+  ignore_errors: yes  # seems to false-negative fail
   systemd:
     name: '{{ item }}'
     #enabled: yes  # apparently, doesn't work

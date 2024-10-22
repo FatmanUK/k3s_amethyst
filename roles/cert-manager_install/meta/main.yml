@@ -1,15 +1,13 @@
 ---
 dependencies:
   - vars:
-      repo_name: 'bitnami'
-      repo_url: 'https://charts.bitnami.com/bitnami'
+      chart_repo_name: 'bitnami'
+      chart_repo_url: 'https://charts.bitnami.com/bitnami'
+      chart_namespace: 'cert-manager-system'
       chart_name: 'cert-manager'
       chart_version: '{{ cert_manager_version }}'
-      chart_namespace: '{{ cert_manager_namespace }}'
       chart_install_timeout: '{{ cert_manager_install_timeout }}'
-      chart_extra_args:
-        - '--set'
-        - 'installCRDs=true'
-    role: 'meta_helm_chart_install'
+      chart_extra_args: '--set installCRDs=true'
+    role: 'meta_chart_install_2'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

@@ -1,4 +1,4 @@
 ---
-ingress_nginx_namespace: 'ingress-nginx'
+
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

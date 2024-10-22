@@ -1,9 +1,9 @@
 ---
-metallb_api: 'metallb.io/v1beta1'
 metallb_namespace: 'metallb-system'
 metallb_pool_name: 'ip-pool-1'
-metallb_pool_first_host_id: '201'
+metallb_pool_min_host_id: '201'
 metallb_pool_size: 20
-metallb_pool_last_host_id: '{{ [ 255, (metallb_pool_first_host_id | int) + metallb_pool_size - 1] | min }}'
+max_host_id: '{{ (metallb_pool_min_host_id | int) + metallb_pool_size - 1 }}'
+metallb_pool_max_host_id: '{{ [ 255, (max_host_id | int) ] | min }}'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

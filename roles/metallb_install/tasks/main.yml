@@ -1,12 +1,19 @@
 ---
-- name: 'Configure IP pools'
-  args:
-    stdin: '{{ lookup("template", "ip_pool.yaml.j2") }}'
-  command:
-    argv:
-      - '/usr/local/bin/kubectl'
-      - 'apply'
-      - '-f'
-      - '-'
+- name: 'Set up IP pool'
+  vars:
+    dest_file: '/dev/shm/ip_pool.yaml'
+  block:
+    - name: 'Template in manifest for IP pool'
+      template:
+        src: '{{ dest_file | basename }}.j2'
+        dest: '{{ dest_file }}'
+
+    - name: 'Configure IP pool'
+      command:
+        argv:
+          - '/usr/local/bin/kubectl'
+          - 'apply'
+          - '-f'
+          - '{{ dest_file }}'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

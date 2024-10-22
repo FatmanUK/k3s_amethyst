@@ -1,14 +1,15 @@
 ---
-apiVersion: {{ metallb_api }}
+apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
 metadata:
   name: {{ metallb_pool_name }}
   namespace: {{ metallb_namespace }}
 spec:
   addresses:
-    - 10.20.0.{{ metallb_pool_first_host_id }}-10.20.0.{{ metallb_pool_last_host_id }}
+    - 10.20.0.{{ metallb_pool_min_host_id }}-10.20.0.{{ metallb_pool_max_host_id }}
+
 ---
-apiVersion: {{ metallb_api }}
+apiVersion: metallb.io/v1beta1
 kind: L2Advertisement
 metadata:
   name: empty

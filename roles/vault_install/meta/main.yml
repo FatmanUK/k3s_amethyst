@@ -16,4 +16,4 @@ dependencies:
       want_authentication: no
     role: 'meta_ingress_create'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

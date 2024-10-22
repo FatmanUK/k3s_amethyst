@@ -1,7 +1,7 @@
 ---
 - name: 'Copy kube config to builder'
   vars:
-    conf_file: '/tmp/cluster.conf'
+    conf_file: '/var/tmp/cluster.conf'
   block:
     - name: 'Copy kube config'
       fetch:

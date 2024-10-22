@@ -1,5 +1,8 @@
 ---
-longhorn_namespace: 'longhorn-system'
-longhorn_ip: '{{ subnet | ipaddr(longhorn_host_id) | ipaddr("address") }}'
+#longhorn_ip: '{{ subnet | ipaddr(longhorn_host_id) | ipaddr("address") }}'
+
+longhorn_vol_replicas: '1'
+longhorn_vol_replicas_ui_created: '{{ longhorn_vol_replicas }}'
+longhorn_vol_replicas_kube_created: '{{ longhorn_vol_replicas }}'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml
