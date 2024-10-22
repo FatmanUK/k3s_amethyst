@@ -1,0 +1,19 @@
+---
+- name: 'Template in patches'
+  loop: '{{ patches }}'
+  template:
+    src: '{{ playbook_dir }}/patches/{{ item.file }}.yml.j2'
+    dest: '/dev/shm/{{ item.file }}.yml'
+
+- name: 'Patch manifest'
+  loop: '{{ patches }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'patch'
+      - '-n'
+      - '{{ item.namespace }}'
+      - '--patch-file=/dev/shm/{{ item.file }}.yml'
+      - '{{ item.kind }}/{{ item.name }}'
+...
+# vim: set filetype=yaml

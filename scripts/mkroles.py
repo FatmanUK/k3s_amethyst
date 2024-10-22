@@ -10,7 +10,7 @@ from sys import argv
 blank_yaml='''---
 
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml
 '''
 
 def put_role_subdir(d):

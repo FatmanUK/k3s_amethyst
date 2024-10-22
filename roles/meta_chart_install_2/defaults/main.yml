@@ -1,0 +1,7 @@
+---
+chart_namespace: '{{ chart_name }}-system'
+chart_install_timeout: '10m0s'
+chart_values: ''
+chart_tarball: '{{ blob_stage_dir }}/{{ chart_name }}-{{ chart_version }}.tgz'
+...
+# vim: set filetype=yaml

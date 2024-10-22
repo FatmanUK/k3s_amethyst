@@ -2,7 +2,7 @@
 ansible_host: '{{ subnet | ipaddr(host_id) | ipaddr("address") }}'
 
 network_gateway: '{{ subnet | ipaddr(gateway_host_id) | ipaddr("address") }}'
-extra_name_servers: '10.43.0.10'
+extra_name_servers: '8.8.8.8 1.1.1.1'  # don't have more than two
 
 vm_disk_filename: '{{ inventory_hostname }}.qcow2'
 

@@ -2,7 +2,7 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
-# Note: for HA embedded etcd, we MUST use an odd number of master nodes.
+# Note: for HA embedded etcd, we MUST use an odd number of master nodes (also, at least 3).
 # https://docs.k3s.io/datastore/ha-embedded
 
 # Work: while on libvirt8, run with "--skip-tags=broken_on_libvirt_8"
@@ -37,31 +37,45 @@
     - role: 'xbps_setup'
       when:
         - 'has_xbps'
+    # Ubuntu libvirtd has bugs :(
     - role: 'yum_setup'
       when:
         - 'has_yum'
+        - 'libvirtd_version is version("9.0", ">")'
     - role: 'apt_setup'
       when:
         - 'has_apt'
-    - 'rsyslog_setup'
+    - role: 'rsyslog_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'service_start'
       vars:
         services:
           - 'rsyslog'
-    - 'logrotate_setup'
+    - role: 'logrotate_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - 'openssh_server_setup'
     - role: 'selinux_setup'
       when:
         - 'mandatory_access_control == "selinux"'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'apparmor_setup'
       when:
         - 'mandatory_access_control == "apparmor"'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - 'grub_setup'
     - 'services_tidy'
     - 'files_tidy'
     - role: 'iptables_setup'
       when:
         - 'has_iptables'  # is this right? maybe redesign this role
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'service_start'
       when:
         - 'has_iptables'
@@ -85,7 +99,12 @@
       when:
         - 'not has_dhcpcd'
         - 'not has_sysconfig'
-    - 'chrony_setup'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
+    - role: 'chrony_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
 # Ubuntu hates chrony apparently?
 # TODO #13: fix
 #    - role: 'service_start'
@@ -182,7 +201,7 @@
 
 - name: 'Copy kube config to builder'
   hosts: 'primaries'
-  run_once: yes
+  run_once: yes  # note! run_once
   become: no
   gather_facts: no
   handlers:
@@ -190,33 +209,32 @@
   roles:
     - 'k3s_copy_config'
 
-- name: 'Generate API tokens'
+- name: 'Configuration'
   hosts: 'primaries'
   become: no
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
+  vars:
+    patches:  # for kubectl_patch
+      - file: 'coredns-memory'
+        kind: 'deployments.app'
+        name: 'coredns'
+        namespace: 'kube-system'
   roles:
     - 'nodes_check'
     - 'k3s_apitokens_generate'
+    - role: 'helm_install'
+      become: yes
+    - 'kubectl_patch'
+    - 'calico_install'
 
-- name: 'Install Helm'
-  hosts: 'primaries'
-  become: yes
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  roles:
-    - 'helm_install'
-    - 'coredns_patch'
+# TODO?: No scheduling on control planes (except local-path, coredns and metrics server):
+# kubectl taint node k3s-mother-0?.k3s.lab k3s-controlplane=true:NoSchedule
 
-#No scheduling on control planes:
-#kubectl taint node k3s-mother-0?.k3s.lab k3s-controlplane=true:NoSchedule
-#
-#Except local-path, coredns and metrics server:
-#Edit deployments/local-path-provisioner,
-#deployments/coredns,
-#deployments/metrics-server
+# Edit deployments/local-path-provisioner,
+# deployments/coredns,
+# deployments/metrics-server
 #      tolerations:
 #      - effect: NoExecute
 #        operator: Exists
@@ -230,7 +248,6 @@
   handlers:
     - import_tasks: 'handlers/main.yml'
   roles:
-    - 'calico_install'
 # TODO: wait for nodes to be up
 # Wait for these too:
 
@@ -277,11 +294,13 @@
     - 'install_apps'
   roles:
     - 'benthos_install'
+    #- do_nothing
     - 'vault_install'
+    #- fail_egregiously
     - 'kerberos_install'
     - 'openldap_install'
     - 'postgresql_install'
     - 'prometheus_install'
     - 'grafana_install'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

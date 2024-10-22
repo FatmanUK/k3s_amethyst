@@ -21,4 +21,4 @@
 #          - 'patch'
 #          - '--patch-file={{ patch_file }}'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml
