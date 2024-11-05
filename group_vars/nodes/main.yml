@@ -19,7 +19,7 @@ calico_dir: '/var/lib/calico'
 blob_stage_dir: 'blobs'
 blob_tmp_dir: '/dev/shm'
 
-longhorn_version: '1.6.2'
+longhorn_version: '1.7.2'
 longhorn_install_timeout: '30m0s'
 longhorn_host_id: '202'
 
