@@ -1,0 +1,19 @@
+---
+dependencies:
+  - vars:
+      repo_name: 'hashicorp'
+      repo_url: 'https://helm.releases.hashicorp.com'
+      chart_name: 'vault'
+      chart_version: '{{ vault_version }}'
+      chart_namespace: '{{ vault_namespace }}'
+      chart_install_timeout: '{{ vault_install_timeout }}'
+    role: 'meta_helm_chart_install'
+  - vars:
+      ingress_prefix: 'vault'
+      ingress_namespace: '{{ vault_namespace }}'
+      ingress_service: 'vault'
+      ingress_user: 'breakglassbackdoor'
+      want_authentication: no
+    role: 'meta_ingress_create'
+...
+# vim: set filetype=yaml

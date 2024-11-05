@@ -1,4 +1,8 @@
 ---
-openldap_namespace: 'openldap-system'
+openldap_replicas: '1'
+openldap_domain: 'k3s.lab'
+openldap_suffix: 'dc=k3s,dc=lab'
+openldap_organisation_name: 'K3S Amethyst'
+openldap_organisation_description: 'The bestest LDAP Organisation in this whole dang cluster'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

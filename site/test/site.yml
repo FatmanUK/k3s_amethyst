@@ -23,8 +23,8 @@ os_voidlinux:
     #  host_id: '12'
     k3s-child-03:
       host_id: '13'
-    #k3s-child-04:
-    #  host_id: '14'
+    k3s-child-04:
+      host_id: '14'
     k3s-child-05:
       host_id: '15'
 
@@ -52,6 +52,7 @@ secondaries:
 agents:
   hosts:
     k3s-child-03:
+    k3s-child-04:
     k3s-child-05:
 ...
 # vim: set filetype=yaml:

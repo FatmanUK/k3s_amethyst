@@ -1,6 +1,4 @@
 ---
-cert_manager_namespace: 'cert-manager-system'
-
 ca_certificate_name: 'k3s-amethyst-ca-crt'
 ca_secret_name: 'k3s-amethyst-secret'
 ca_key_algorithm: 'RSA'

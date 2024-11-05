@@ -1,18 +1,21 @@
 ---
 dependencies:
   - vars:
-      repo_name: 'prometheus-community'
-      repo_url: 'https://prometheus-community.github.io/helm-charts'
+      chart_repo_name: 'prometheus-community'
+      chart_repo_url: 'https://prometheus-community.github.io/helm-charts'
+      chart_namespace: 'prometheus-system'
       chart_name: 'prometheus'
       chart_version: '{{ prometheus_version }}'
-      chart_namespace: '{{ prometheus_namespace }}'
-      chart_install_timeout: '{{ prometheus_install_timeout }}'
-    role: 'meta_helm_chart_install'
+      #chart_install_timeout: '{{ prometheus_install_timeout }}'
+    role: 'meta_chart_install_2'
+  # BUG #60: installing like this, the name of the backend service is no
+  # longer "prometheus-server", but something with a generated name
+  # like "prometheus-1729868964-server".
   - vars:
       ingress_prefix: 'prometheus'
-      ingress_namespace: '{{ prometheus_namespace }}'
+      ingress_namespace: 'prometheus-system'
       ingress_service: 'prometheus-server'
       ingress_user: 'breakglassbackdoor'
     role: 'meta_ingress_create'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

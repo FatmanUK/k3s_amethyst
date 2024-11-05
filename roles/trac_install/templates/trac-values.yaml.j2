@@ -1,0 +1,132 @@
+---
+replicaCount: 1
+
+image:
+  repository: registry.gitlab.com/trac-app-k8s/trac-docker
+  pullPolicy: IfNotPresent
+  tag: "main"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+env:
+- name: TRAC_PROJECT_NAME
+  value: K3S Amethyst
+- name: TRAC_CONFIG_HEADER_LOGO__SRC
+  value: https://i.ibb.co/hWB9c9P/002-w-95352f5e.jpg
+- name: TRAC_CONFIG_HEADER_LOGO__HEIGHT
+  value: "100"
+- name: TRAC_CONFIG_HEADER_LOGO__LINK
+  value: "/timeline"
+#- name: TRAC_DB_STRING
+#  value: "postgres://postgres:GMWWDGZrtd@10.43.182.241:5432/trac?schema=public"
+
+# Specify trac.ini file here.
+# Overwrites ALL env settings,
+# except secrets section
+# https://trac.edgewall.org/wiki/TracIni
+customConfig: ""
+# customConfig: |
+#   [changeset]
+#   max_diff_bytes = 10000000
+#   max_diff_files = 0
+#   wiki_format_messages = enabled
+
+#   [header_logo]
+#   alt = (please configure the [header_logo] section in trac.ini)
+#   height = -1
+#   link =
+#   src = site/your_project_logo.png
+#   width = -1
+
+postgresql:
+  ## Deploy PostgreSQL using bundled chart
+  # To use an external database, set this to false and configure the settings
+  # under externalDatabase
+  enabled: false
+
+  serviceAccount:
+    enabled: true
+
+  postgresqlUsername: trac_user
+  # postgresqlPassword: postgres
+  postgresqlDatabase: trac_db
+
+  persistence:
+    enabled: true
+    # storageClass: "-"
+    accessModes:
+    - ReadWriteOnce
+    size: 4Gi
+
+  volumePermissions:
+    enabled: false
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  ingressClassName: ""
+  annotations: {}
+    # ingress.kubernetes.io/force-ssl-redirect: "true"
+    # cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+  - host: trac.k3s.lab
+    paths:
+    - path: /
+      pathType: ImplementationSpecific
+  tls:
+  - secretName: chart-example-tls
+    hosts:
+      - trac.k3s.lab
+
+resources: {}
+  # limits:
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+secrets:
+  TRAC_ADMIN_PASSWORD: ""
+  TRAC_DB_STRING: "postgres://postgres:GMWWDGZrtd@10.43.182.241:5432/trac?schema=public"
+...
+# vim: set filetype=yaml:

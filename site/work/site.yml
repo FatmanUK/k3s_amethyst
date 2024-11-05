@@ -6,6 +6,7 @@ all:
     subnet: '10.20.0.0/24'
     domain: 'k3s.lab'
     gateway_host_id: '253'
+    is_virtual: yes
 
 os_rhel:
   vars:
@@ -45,6 +46,7 @@ builder:
   hosts:
     build-1:
       ansible_user: 'adam.richardson'
+      is_virtual: no
 
 foreman:
   hosts:

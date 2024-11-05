@@ -1,7 +1,4 @@
 ---
-- name: 'Checks'
-  import_playbook: 'checks.yml'
-
 - name: 'Ping all hosts'
   hosts: 'all'
   become: no

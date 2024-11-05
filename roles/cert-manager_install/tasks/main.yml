@@ -1,66 +1,33 @@
 ---
-- name: 'Set up automatic certificate rotation'
+- name: 'Set up issuers'
   vars:
-    issuers_yaml: |
-      ---
-      apiVersion: cert-manager.io/v1
-      kind: Issuer
-      metadata:
-        name: {{ ca_certificate_issuer }}
-        namespace: {{ cert_manager_namespace }}
-      spec:
-        selfSigned: {}
-      ---
-      apiVersion: cert-manager.io/v1
-      kind: Certificate
-      metadata:
-        name: {{ ca_certificate_name }}
-        namespace: {{ cert_manager_namespace }}
-      spec:
-        secretName: {{ ca_secret_name }}
-        privateKey:
-          algorithm: {{ ca_key_algorithm }}
-          encoding: {{ ca_key_encoding }}
-          size: {{ ca_key_size }}
-        duration: {{ ca_duration_h }}h
-        renewBefore: {{ ca_renew_before_h }}h
-        isCA: true
-        subject:
-          organizations:
-            - '{{ ca_org }}'
-        emailAddresses:
-          - '{{ ca_email }}'
-        issuerRef:
-          name: {{ ca_certificate_issuer }}
-          kind: Issuer
-          group: cert-manager.io
-      ---
-      apiVersion: cert-manager.io/v1
-      kind: ClusterIssuer
-      metadata:
-        name: {{ certificate_issuer }}
-        namespace: {{ cert_manager_namespace }}
-      spec:
-        ca:
-          secretName: {{ ca_secret_name }}
-      ...
-  environment:
-    stdin: '{{ issuers_yaml }}'
-  command:
-    argv:
-      - '/usr/local/bin/kubectl'
-      - 'apply'
-      - '-f'
-      - '-'
+    dest_file: '/dev/shm/issuers.yaml'
+  block:
+    - name: 'Template in manifest for issuers'
+      template:
+        src: '{{ dest_file | basename }}.j2'
+        dest: '{{ dest_file }}'
 
-- name: 'Get the CA certificate in PEM format (for loading into Firefox)'
+    - name: 'Configure auto-rotate of certs'
+      command:
+        argv:
+          - '/usr/local/bin/kubectl'
+          - 'apply'
+          - '-f'
+          - '{{ dest_file }}'
+
+# need to deploy an actual ingress for this to work properly
+- name: 'Get the CA certificate (for web browsers)'
   register: 'reg_ca_crt'
+  retries: 60
+  delay: 5
+  until: 'reg_ca_crt is success'
   command:
     argv:
       - '/usr/local/bin/kubectl'
       - 'get'
       - '-n'
-      - '{{ cert_manager_namespace }}'
+      - 'cert-manager-system'
       - 'secret/{{ ca_secret_name }}'
       - '-o'
       - 'jsonpath="{.data.ca\.crt}"'
@@ -69,5 +36,11 @@
   copy:
     content: '{{ reg_ca_crt.stdout | b64decode }}'
     dest: 'k3s-ca.crt'
+
+- name: 'Fetch certificate to build host'
+  fetch:
+    flat: yes
+    src: 'k3s-ca.crt'
+    dest: 'k3s-ca.crt'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

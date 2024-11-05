@@ -9,6 +9,8 @@ has_yum: no
 has_apt: no
 has_dhcpcd: yes
 
+k3s_clobber_files_distro: [ ]
+
 update_servers:
   - ip: '65.21.160.177'
     domain: 'voidlinux.org'

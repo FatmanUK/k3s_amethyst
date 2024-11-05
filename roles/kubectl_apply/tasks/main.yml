@@ -1,0 +1,16 @@
+---
+- name: 'Template in manifests'
+  loop: '{{ manifests }}'
+  template:
+    src: '{{ playbook_dir }}/manifests/{{ item }}.yml.j2'
+    dest: '/dev/shm/{{ item }}.yml'
+
+- name: 'Apply manifest'
+  loop: '{{ manifests }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'apply'
+      - '--filename=/dev/shm/{{ item }}.yml'
+...
+# vim: set filetype=yaml

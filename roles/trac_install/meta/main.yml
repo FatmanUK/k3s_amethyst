@@ -1,0 +1,13 @@
+---
+dependencies:
+  - vars:
+      repo_name: 'trac'
+      repo_url: 'https://gitlab.com/api/v4/projects/39956701/packages/helm/stable'
+      chart_name: 'trac'
+      chart_version: '{{ trac_version }}'
+      chart_namespace: '{{ trac_namespace }}'
+      chart_install_timeout: '{{ trac_install_timeout }}'
+      chart_values_template: 'trac-values.yaml.j2'
+    role: 'meta_helm_chart_install'
+...
+# vim: set filetype=yaml:

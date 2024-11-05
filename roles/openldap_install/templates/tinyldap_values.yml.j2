@@ -1,0 +1,74 @@
+---
+## User configurable settings ##########################################
+# Full reference to a Docker image to use for our chart
+# Maybe don't expose this in values.yaml?
+image: 'ghcr.io/dreamtrack-net/tinyldap:2024-10-09'
+
+# Number of pods Statefulset will spin up
+replicas: {{ openldap_replicas }}
+
+# Domain
+domain: '{{ openldap_domain }}'
+suffix: '{{ openldap_suffix }}'
+
+# Organisation details
+organisation:
+  name: '{{ openldap_organisation_name }}'
+  description: '{{ openldap_organisation_description }}'
+
+realmAdmin:
+  name: 'zeus'
+  userPwHash: '{SSHA}JWA/xti9Me/iEt8hKqFBV6JcO6BWTKlV'
+  homeDir: '/mnt/olympus'
+  loginShell: '/bin/bash'
+  gecos: 'The Almighty'
+
+# Online config (OLC) admin
+olcAdmin:
+  rootRdn: 'cn=admin'
+  # Hint: dev user password
+  rootPwHash: '{SSHA}gSIuDVYLAQmbamahlILBugabdWE7Q5ld'
+
+# OLC TLS certificate details
+olcTLS:
+  # use this to make ldap.{domain}, ldap-0.{domain} and ldap-1.{domain},
+  # etc for more replicas
+  dnsNamePrefix: 'ldap'
+  clusterIssuerName: 'k3s-amethyst-issuer'
+
+## Probably no need to change anything after this line #################
+# Required storage/Mb for metadata and data
+meta_storage_mb: 256
+data_storage_mb: 2048
+
+userOuRdn: 'ou=users'
+
+extraOus:
+  - 'serviceaccounts'
+  - 'groups'
+  - 'hosts'
+
+# TODO: oh, this looks like an old version. These are back? Update it.
+ldapPort: 10389
+
+ldapsPort: 10636
+
+# Service ports
+# needs to be JSON-ish, apparently?
+ports: '
+[
+  {name: ldap, port: 389, protocol: TCP, targetPort: 10389},
+  {name: ldaps, port: 636, protocol: TCP, targetPort: 10636}
+]
+'
+
+# Pod ports
+# needs to be JSON-ish, apparently?
+container_ports: '
+[
+  {containerPort: 10389, name: ldap},
+  {containerPort: 10636, name: ldaps}
+]
+'
+...
+# vim: set filetype=yaml

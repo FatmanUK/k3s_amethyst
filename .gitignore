@@ -4,3 +4,5 @@ blobs/*gz
 *.pyc
 rpms/*rpm
 tls/
+go.sum
+k3s-ca.crt

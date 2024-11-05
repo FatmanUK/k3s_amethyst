@@ -1,7 +1,4 @@
 ---
-- name: 'Checks'
-  import_playbook: 'checks.yml'
-
 - name: 'Start all hosts'
   hosts: 'all'
   connection: 'local'
@@ -13,11 +10,31 @@
   tags:
     - 'start'
   tasks:
-    - loop: '{{ groups.all | difference(groups.builder) }}'
+    - register: 'reg_start'
+      vars:
+        e_already: 'Domain is already active'
+      loop: '{{ groups.all | difference(groups.builder) }}'
+      changed_when:
+        - 'reg_start.rc == 0'
+        - 'e_already not in reg_start.stderr'
+      failed_when:
+        - 'reg_start.rc != 0'
+        - 'e_already not in reg_start.stderr'
       command:
         argv:
           - 'virsh'
           - 'start'
           - '{{ item }}.{{ domain }}'
+
+- name: 'Start registries'
+  hosts: 'primaries'
+  become: no
+  gather_facts: no
+  handlers:
+    - import_tasks: 'handlers/main.yml'
+  tags:
+    - 'start'
+  roles:
+    - 'builder_registry_check'
 ...
 # vim: set filetype=yaml:

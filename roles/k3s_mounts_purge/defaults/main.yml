@@ -1,0 +1,8 @@
+---
+unmount_points:
+  - '/var/lib/kubelet'
+
+extra_unmount_points:
+  - '/var/lib/nfs/rpc_pipefs'
+...
+# vim: set filetype=yaml:

@@ -1,13 +1,12 @@
 ---
 dependencies:
   - vars:
-      # ? not official
-      repo_name: 'helm-openldap'
-      repo_url: 'https://jp-gouin.github.io/helm-openldap'
-      chart_name: 'openldap-stack-ha'
-      chart_version: '{{ openldap_version }}'
-      chart_namespace: '{{ openldap_namespace }}'
-      chart_install_timeout: '{{ openldap_install_timeout }}'
-    role: 'meta_helm_chart_install'
+      chart_repo_name: '../tinyldap/helm'
+      chart_namespace: 'openldap-system'
+      chart_name: 'tinyldap'
+      chart_version: '0.0.1'
+      chart_values: 'tinyldap_values.yml'
+      chart_local: yes
+    role: 'meta_chart_install_2'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

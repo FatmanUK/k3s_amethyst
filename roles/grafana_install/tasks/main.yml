@@ -1,5 +1,5 @@
 ---
-# hmm. not convinced this is right. TODO: check
+# hmm. not convinced this is right. TODO #51: check
 - name: 'Patch helm chart'
   vars:
     remote_helm_binary: '{{ k3s_binary_dir }}/helm'
@@ -35,5 +35,24 @@
   copy:
     content: '{{ reg_grafana_password.stdout | b64decode }}'
     dest: 'grafana-admin-password.txt'
+
+- name: 'Update the config configmap'
+  environment:
+    stdin: |
+      ---
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: grafana
+        namespace: grafana-system
+      data:
+        grafana.ini: |
+      {{ lookup("template", "grafana.ini.j2")  | indent(width=10, indentfirst=True)}}
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'apply'
+      - '-f'
+      - '-'
 ...
 # vim: set filetype=yaml:

@@ -2,6 +2,20 @@
 # Do not reboot to unmount. Find another way.
 # Maybe a lazy unmount?
 
+- name: 'Run killall script'
+  register: 'reg_killall'
+  failed_when: no  # makes it idempotent
+  command:
+    argv:
+      - '/usr/local/bin/k3s-killall.sh'
+
+- name: 'Pause 5 seconds'
+  when:
+    - 'reg_killall.rc == 0'
+  run_once: yes
+  pause:
+    seconds: 5
+
 - name: 'Unmount kubelet and nfs'
   register: 'reg_unmount'
   become: yes

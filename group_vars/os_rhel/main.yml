@@ -9,6 +9,8 @@ has_yum: yes
 has_apt: no
 has_dhcpcd: no
 
+k3s_clobber_files_distro: [ ]
+
 systemd_uses_usrlib: yes
 
 update_servers: [ ]

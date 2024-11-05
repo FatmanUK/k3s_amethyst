@@ -17,8 +17,7 @@
   notify:
     - 'Reload nftables'
   copy:
-    remote_src: yes
-    src: '/dev/null'
+    content: ''
     dest: '/etc/sysconfig/nftables.conf'
 ...
 # vim: set filetype=yaml:

@@ -1,4 +1,8 @@
 ---
+secret_name: 'basic-auth'
+ingress_service_port: '80'
 
+want_authentication: yes
+want_tls: yes
 ...
 # vim: set filetype=yaml:

@@ -3,8 +3,15 @@
   debug:
     msg: 'noop'
 
-# Reload iptables
 # Reload nftables
 
+- name: 'Reload iptables'
+  block:
+    - service:
+        name: 'iptables'
+        state: 'stopped'
+    - service:
+        name: 'iptables'
+        state: 'started'
 ...
 # vim: set filetype=yaml:
