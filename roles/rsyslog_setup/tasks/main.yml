@@ -1,6 +1,6 @@
 ---
 # TODO #49: make script (multiple consecutive command tasks)
-# TODO: Also not sure this belongs here
+# TODO #54: Also not sure this belongs here
 - name: 'Stop sending kernel logs to console'
   command:
     argv:
