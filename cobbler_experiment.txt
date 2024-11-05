@@ -1,0 +1,84 @@
+https://cobbler.readthedocs.io/en/latest/quickstart-guide.html
+
+(need Ubuntu as a base because we need systemd, blech)
+
+(make sure hostname is set, dual-homed IPs are set up, iptables is default allow, SELinux is not installed, and hosts file is sane)
+
+Manually add to Ansible-managed file /etc/network/interfaces.d/eth0, uh-oh!
+
+auto eth0:1
+iface eth0:1 inet static
+	address 172.16.0.1/24
+	network 172.16.0.0
+	dns-nameservers 172.168.0.1  # needed?
+
+echo 'deb http://download.opensuse.org/repositories/systemsmanagement:/cobbler:/release33/xUbuntu_22.04/ /' | sudo tee /etc/apt/sources.list.d/systemsmanagement:cobbler:release33.list
+curl -fsSL https://download.opensuse.org/repositories/systemsmanagement:cobbler:release33/xUbuntu_22.04/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/systemsmanagement_cobbler_release33.gpg > /dev/null
+sudo apt update
+sudo apt install cobbler syslinux apache2 isc-dhcp-server
+
+(installs lots of packages including Apache)
+(subtask: replace Apache bloat with nginx?)
+(turn off selinux if it's on to begin with)
+(firewall instructions, "tbd" :/ )
+(Settings are stored in /etc/cobbler/settings.yaml)
+
+openssl passwd -1
+(store result in default_password_crypted var in settings file)
+
+(set server: and next_server_v4: to 172.168.0.1)
+(manage_dhcp: true, ..._v4: true, ..._v6: false
+(we will dual-home this box)
+(probably need to modify /etc/cobbler/dhcp.template)
+(
+probably only this block:
+subnet 192.168.1.0 netmask 255.255.255.0 {
+    option routers             192.168.1.1;
+    option domain-name-servers 192.168.1.210,192.168.1.211;
+    option subnet-mask         255.255.255.0;
+    filename                   "/pxelinux.0";
+    default-lease-time         21600;
+    max-lease-time             43200;
+    next-server                $next_server_v4;
+}
+don't change the next-server line.
+hmm, done my best but...
+)
+(cobbler needs maybe 10G space free in /var for target OSes)
+
+(add block to /etc/dhcp/dhcpd.conf:
+subnet 172.16.0.0 netmask 255.255.255.0 {
+}
+)
+
+a2enmod proxy proxy_http rewrite
+a2enconf cobbler
+echo "Include /etc/apache2/conf-enabled" | tee /etc/apache2/apache2.conf
+systemctl restart apache2
+ln -s /usr/lib/systemd/system/{isc-dhcp-server,dhcpd}.service
+systemctl daemon-reload
+systemctl enable dhcpd
+systemctl start dhcpd
+systemctl enable cobblerd
+systemctl start cobblerd
+systemctl status cobblerd
+cobbler check
+
+systemctl restart cobblerd
+cobbler sync
+
+Target OS Import
+================
+Download a full (not live) image.
+
+Mount it.
+$ sudo mount /dev/sr0 /cdrom
+
+Import.
+# cobbler import --name=voidlinux_20240314_glibc --arch=x86_64 --path=/cdrom
+
+Continue...
+https://cobbler.readthedocs.io/en/latest/quickstart-guide.html
+
+
+
