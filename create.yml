@@ -37,31 +37,45 @@
     - role: 'xbps_setup'
       when:
         - 'has_xbps'
+    # Ubuntu libvirtd has bugs :(
     - role: 'yum_setup'
       when:
         - 'has_yum'
+        - 'libvirtd_version is version("9.0", ">")'
     - role: 'apt_setup'
       when:
         - 'has_apt'
-    - 'rsyslog_setup'
+    - role: 'rsyslog_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'service_start'
       vars:
         services:
           - 'rsyslog'
-    - 'logrotate_setup'
+    - role: 'logrotate_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - 'openssh_server_setup'
     - role: 'selinux_setup'
       when:
         - 'mandatory_access_control == "selinux"'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'apparmor_setup'
       when:
         - 'mandatory_access_control == "apparmor"'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - 'grub_setup'
     - 'services_tidy'
     - 'files_tidy'
     - role: 'iptables_setup'
       when:
         - 'has_iptables'  # is this right? maybe redesign this role
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
     - role: 'service_start'
       when:
         - 'has_iptables'
@@ -85,7 +99,12 @@
       when:
         - 'not has_dhcpcd'
         - 'not has_sysconfig'
-    - 'chrony_setup'
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
+    - role: 'chrony_setup'
+      when:
+        - 'not has_yum
+           or libvirtd_version is version("9.0", ">")'
 # Ubuntu hates chrony apparently?
 # TODO #13: fix
 #    - role: 'service_start'
