@@ -31,10 +31,11 @@
 #    #enabled: yes  # apparently, doesn't work
 #    state: 'enabled'
 
-# TODO: possibly add retries?
+# TODO #53: possibly add retries? seems to false-negative fail, added ignore_errors for now
 - name: 'Start systemd service'
   when:
     - 'has_systemd'
+  ignore_errors: yes
   systemd:
     name: '{{ item }}'
     #enabled: yes  # apparently, doesn't work
