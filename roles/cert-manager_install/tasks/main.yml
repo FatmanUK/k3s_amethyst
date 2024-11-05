@@ -1,26 +1,33 @@
 ---
-- name: 'Template in manifest'
-  template:
-    src: 'issuers.yaml.j2'
-    dest: '/dev/shm/issuers.yaml'
+- name: 'Set up issuers'
+  vars:
+    dest_file: '/dev/shm/issuers.yaml'
+  block:
+    - name: 'Template in manifest for issuers'
+      template:
+        src: '{{ dest_file | basename }}.j2'
+        dest: '{{ dest_file }}'
 
-- name: 'Set up automatic certificate rotation'
-  command:
-    argv:
-      - '/usr/local/bin/kubectl'
-      - 'apply'
-      - '-f'
-      - '/dev/shm/issuers.yaml'
+    - name: 'Configure auto-rotate of certs'
+      command:
+        argv:
+          - '/usr/local/bin/kubectl'
+          - 'apply'
+          - '-f'
+          - '{{ dest_file }}'
 
-# TODO: add pause
-- name: 'Get the CA certificate in PEM format (for loading into Firefox)'
+# need to deploy an actual ingress for this to work properly
+- name: 'Get the CA certificate (for web browsers)'
   register: 'reg_ca_crt'
+  retries: 60
+  delay: 5
+  until: 'reg_ca_crt is success'
   command:
     argv:
       - '/usr/local/bin/kubectl'
       - 'get'
       - '-n'
-      - '{{ cert_manager_namespace }}'
+      - 'cert-manager-system'
       - 'secret/{{ ca_secret_name }}'
       - '-o'
       - 'jsonpath="{.data.ca\.crt}"'
@@ -29,5 +36,11 @@
   copy:
     content: '{{ reg_ca_crt.stdout | b64decode }}'
     dest: 'k3s-ca.crt'
+
+- name: 'Fetch certificate to build host'
+  fetch:
+    flat: yes
+    src: 'k3s-ca.crt'
+    dest: 'k3s-ca.crt'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

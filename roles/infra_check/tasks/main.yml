@@ -1,0 +1,48 @@
+---
+- name: 'Wait for nodes to exist'
+  register: 'reg_nodes'
+  retries: 100
+  delay: 20
+  until:
+    - 'reg_nodes is success'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'get'
+      - 'node'
+      - '{{ inventory_hostname }}.{{ domain }}'
+
+- name: 'Wait for deployments to be available'
+  register: 'reg_deps_avail'
+  retries: 100
+  delay: 20
+  until:
+    - 'reg_deps_avail is success'
+  loop:
+    - namespace: 'tigera-operator'
+      label: 'k8s-app=tigera-operator'
+    - namespace: 'calico-apiserver'
+      label: 'app.kubernetes.io/name=calico-apiserver'
+    - namespace: 'calico-system'
+      label: 'k8s-app=calico-kube-controllers'
+    - namespace: 'calico-system'
+      label: 'k8s-app=calico-typha'
+    - namespace: 'kube-system'
+      label: 'k8s-app=kube-dns'
+    - namespace: 'kube-system'
+      label: 'objectset.rio.cattle.io/hash=183f35c65ffbc3064603f43f1580d8c68a2dabd4'
+    - namespace: 'kube-system'
+      label: 'k8s-app=metrics-server'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'wait'
+      - '-n'
+      - '{{ item.namespace }}'
+      - '-l'
+      - '{{ item.label }}'
+      - '--for'
+      - 'condition=available'
+      - 'deployment.apps'
+...
+# vim: set filetype=yaml

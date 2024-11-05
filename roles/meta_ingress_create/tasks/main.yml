@@ -22,6 +22,8 @@
         argv:
           - 'uuidgen'
 
+    # TODO #56: add to password vault instead
+    # Maybe not as this might need a custom module
     - name: 'Write password file'
       copy:
         content: '{{ reg_gen_pw.stdout }}'
@@ -32,7 +34,7 @@
     - name: 'Hash password'
       register: 'reg_pw_hash'
       vars:
-        # TODO: improve this: it's a pepper currently
+        # TODO #55: improve this: it's a pepper currently
         salt: 'potatoes'
       command:
         argv:

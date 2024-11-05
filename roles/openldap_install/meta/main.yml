@@ -1,36 +1,12 @@
 ---
 dependencies:
   - vars:
-      # ? not official
-      repo_name: 'helm-openldap'
-      repo_url: 'https://jp-gouin.github.io/helm-openldap'
-      chart_name: 'openldap-stack-ha'
-      chart_version: '{{ openldap_version }}'
-      chart_namespace: '{{ openldap_namespace }}'
-      chart_install_timeout: '{{ openldap_install_timeout }}'
-      chart_extra_args:
-        - '-f'
-        - 'my-ldap-values.yaml'
-        #- '--set'
-        #- 'global.ldapDomain=k3s.lab'
-        #- '--set'
-        #- 'global.adminUser=director'
-        #- '--set'
-        #- 'global.adminPassword=blargh'
-    role: 'meta_helm_chart_install'
-  - vars:
-      ingress_prefix: 'openldap-passwd'
-      ingress_namespace: '{{ openldap_namespace }}'
-      ingress_service: 'openldap-stack-ha-ltb-passwd'
-      ingress_user: 'backdoor'
-      secret_name: 'basic-auth-passwd'
-    role: 'meta_ingress_create'
-  - vars:
-      ingress_prefix: 'openldap-admin'
-      ingress_namespace: '{{ openldap_namespace }}'
-      ingress_service: 'openldap-stack-ha-phpldapadmin'
-      ingress_user: 'backdoor'
-      secret_name: 'basic-auth-admin'
-    role: 'meta_ingress_create'
+      chart_repo_name: '../tinyldap/helm'
+      chart_namespace: 'openldap-system'
+      chart_name: 'tinyldap'
+      chart_version: '0.0.1'
+      chart_values: 'tinyldap_values.yml'
+      chart_local: yes
+    role: 'meta_chart_install_2'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

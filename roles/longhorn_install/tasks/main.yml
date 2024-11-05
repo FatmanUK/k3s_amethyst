@@ -1,36 +1,4 @@
 ---
-- name: 'Patch number of replicas (default: 3)'
-  when:
-    - 'longhorn_number_of_replicas != 3'
-  vars:
-    patch: |
-      {
-        "data": {
-          "storageclass.yaml": {
-            "parameters": {
-              "numberOfReplicas": "{{ longhorn_number_of_replicas }}"
-            }
-          }
-        }
-      }
-    tmpfile: '/dev/shm/replicas.json'
-    ns: '{{ longhorn_namespace }}'
-    thing: 'cm/longhorn-storageclass'
-  block:
-    # it's the only way to stop Ansible messing with the JSON :(
-    - name: 'Write out JSON file'
-      copy:
-        content: '{{ patch }}'
-        dest: '{{ tmpfile }}'
 
-    - name: 'Patch'
-      command:
-        argv:
-          - '/usr/local/bin/kubectl'
-          - 'patch'
-          - '-n'
-          - '{{ ns }}'
-          - '{{ thing }}'
-          - '--patch-file={{ tmpfile }}'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml

@@ -3,16 +3,16 @@
 
 # Edit DITs, eg. manager user, base DN, etc.
 
-- name: 'Patch service'
-  vars:
-    patch: '{"spec":{"type":"LoadBalancer"}}'
-  command:
-    argv:
-      - '/usr/local/bin/kubectl'
-      - 'patch'
-      - 'service/openldap-stack-ha'
-      - '-n'
-      - '{{ openldap_namespace }}'
-      - '-p'
-      - '{{ patch }}'
+#- name: 'Patch service'
+#  vars:
+#    patch: '{"spec":{"type":"LoadBalancer"}}'
+#  command:
+#    argv:
+#      - '/usr/local/bin/kubectl'
+#      - 'patch'
+#      - 'service/openldap-stack-ha'
+#      - '-n'
+#      - '{{ openldap_namespace }}'
+#      - '-p'
+#      - '{{ patch }}'
 ...

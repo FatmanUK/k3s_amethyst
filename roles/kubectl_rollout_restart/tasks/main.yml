@@ -1,0 +1,13 @@
+---
+- name: 'Restart deployments'
+  loop: '{{ deployments_for_restart }}'
+  command:
+    argv:
+      - '/usr/local/bin/kubectl'
+      - 'rollout'
+      - '-n'
+      - '{{ item.namespace }}'
+      - 'restart'
+      - 'deploy/{{ item.name }}'
+...
+# vim: set filetype=yaml

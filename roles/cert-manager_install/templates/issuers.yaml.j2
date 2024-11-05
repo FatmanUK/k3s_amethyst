@@ -3,7 +3,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: {{ ca_certificate_issuer }}
-  namespace: {{ cert_manager_namespace }}
+  namespace: cert-manager-system
 spec:
   selfSigned: {}
 
@@ -12,7 +12,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: {{ ca_certificate_name }}
-  namespace: {{ cert_manager_namespace }}
+  namespace: cert-manager-system
 spec:
   secretName: {{ ca_secret_name }}
   privateKey:

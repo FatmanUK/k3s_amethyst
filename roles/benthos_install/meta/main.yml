@@ -1,8 +1,12 @@
 ---
 dependencies:
   - vars:
+      manifests:
+        - 'benthos'
+    role: 'kubectl_apply'
+  - vars:
       ingress_prefix: 'benthos'
-      ingress_namespace: '{{ benthos_namespace }}'
+      ingress_namespace: 'benthos-system'
       ingress_service: 'benthos-service'
       ingress_user: 'benthosuser'
       ingress_service_port: '4195'

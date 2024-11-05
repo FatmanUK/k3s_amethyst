@@ -2,7 +2,7 @@
 - name: 'Checks'
   import_playbook: 'checks.yml'
 
-# Note: for HA embedded etcd, we MUST use an odd number of master nodes.
+# Note: for HA embedded etcd, we MUST use an odd number of master nodes (also, at least 3).
 # https://docs.k3s.io/datastore/ha-embedded
 
 # Work: while on libvirt8, run with "--skip-tags=broken_on_libvirt_8"
@@ -111,8 +111,6 @@
 #      vars:
 #        services:
 #          - 'chronyd'
-    #- 'do_nothing'
-    #- 'fail_egregiously'
 
 #- name: 'Prepare Foreman'
 #  hosts: 'foreman'
@@ -201,7 +199,7 @@
 
 - name: 'Copy kube config to builder'
   hosts: 'primaries'
-  run_once: yes
+  run_once: yes  # note! run_once
   become: no
   gather_facts: no
   handlers:
@@ -209,65 +207,37 @@
   roles:
     - 'k3s_copy_config'
 
-- name: 'Generate API tokens'
+- name: 'Configuration and infrastructure'
   hosts: 'primaries'
   become: no
   gather_facts: no
   handlers:
     - import_tasks: 'handlers/main.yml'
+  vars:
+    patches:  # for kubectl_patch
+      - file: 'coredns-memory'
+        kind: 'deployments.app'
+        name: 'coredns'
+        namespace: 'kube-system'
+    manifests:  # for kubectl_apply
+      - 'coredns-errors'
+    deployments_for_restart:
+      - name: 'coredns'
+        namespace: 'kube-system'
   roles:
     - 'nodes_check'
     - 'k3s_apitokens_generate'
-
-- name: 'Install Helm'
-  hosts: 'primaries'
-  become: yes
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  roles:
-    - 'helm_install'
-    - 'coredns_patch'
-
-#No scheduling on control planes:
-#kubectl taint node k3s-mother-0?.k3s.lab k3s-controlplane=true:NoSchedule
-#
-#Except local-path, coredns and metrics server:
-#Edit deployments/local-path-provisioner,
-#deployments/coredns,
-#deployments/metrics-server
-#      tolerations:
-#      - effect: NoExecute
-#        operator: Exists
-#      - effect: NoSchedule
-#        operator: Exists
-
-- name: 'Install cluster infrastructure'
-  hosts: 'primaries'
-  become: no
-  gather_facts: no
-  handlers:
-    - import_tasks: 'handlers/main.yml'
-  roles:
+    - role: 'helm_install'
+      become: yes
+    - 'kubectl_patch'
+    - 'kubectl_apply'
+    - 'kubectl_rollout_restart'  # for restarting whole deployments
     - 'calico_install'
-# TODO: wait for nodes to be up
-# Wait for these too:
-
-# deployments:
-#calico-system   calico-kube-controllers
-#calico-system   calico-typha
-#kube-system     coredns
-#kube-system     local-path-provisioner
-#kube-system     metrics-server
-#kube-system     tigera-operator
-# pods (optional):
-#kube-system      local-path-provisioner-6c86858495-4fg7j
-#kube-system      metrics-server-54fd9b65b-hftf9
-
-    - 'metallb_install'
-    - 'ingress-nginx_install'
+    - 'infra_check'
     - 'cert-manager_install'
-    - 'longhorn_install'
+    - 'metallb_install'
+    - 'ingress-nginx_install'  # requires cert-manager and metallb
+    - 'longhorn_install'  # requires ingress-nginx
 
 - name: 'Post-install auto-snapshot'
   hosts: 'nodes'
@@ -295,12 +265,12 @@
     - 'nodes'
     - 'install_apps'
   roles:
-    - 'benthos_install'
+    - 'postgresql_install' # how does a service sign up for this?
+    - 'prometheus_install'
+    - 'openldap_install'
     - 'vault_install'
     - 'kerberos_install'
-    - 'openldap_install'
-    - 'postgresql_install'
-    - 'prometheus_install'
     - 'grafana_install'
+    - 'benthos_install'
 ...
-# vim: set filetype=yaml:
+# vim: set filetype=yaml
