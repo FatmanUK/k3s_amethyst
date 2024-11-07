@@ -64,8 +64,19 @@ systemctl start cobblerd
 systemctl status cobblerd
 cobbler check
 
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+
+Install debmirror to quiesce one of the warnings.
+
 systemctl restart cobblerd
 cobbler sync
+
+Are dhcpd and tftpd available?
+
+apt install tftp-hpa
+
+To start, dhcp must have a network specification in /etc/dhcp/dhcpd.conf which corresponds to one of its NICs. The NIC's IP should not be in the DHCP pool range. Don't modify /etc/dhcp/dhcpd.conf directly, edit /etc/cobbler/dhcp.template.
 
 Target OS Import
 ================
@@ -80,5 +91,45 @@ Import.
 Continue...
 https://cobbler.readthedocs.io/en/latest/quickstart-guide.html
 
+Theoretically can install any distro but getting the signature is impossible. No docs. Can also add manually?
 
+boot_loaders: (win only?)
+must match supported_arches. hmm. {"x86_64":["pxe", "ipxe"]}
+supported_repo_breeds:
+uh.
+kernel_file:
+kernel file. /boot/vmlinuz ?
+initrd_file: look at a linux
+default_autoinstall: lin.ks ?
+kernel_options:
+kernel_options_post:
+boot_files: []
+
+cobbler distro add --name=Flatcar --kernel=flatcar/vmlinuz --initrd=flatcar/cpio.gz --kernel-options=flatcar.autologin --arch=x86_64 --breed=coreos --boot-loader=ipxe
+
+root@noble-playground:~# cobbler distro add --name=Flatcar --kernel=/cdrom/flatcar/vmlinuz --initrd=/cdrom/flatcar/cpio.gz --kernel-options=flatcar.autologin --arch=x86_64 --breed=generic --boot-loader=ipxe
+(with Flatcar iso mounted at /cdrom)
+
+{{fqdn}} mac = 52:54:00:fc:98:6f
+
+root@noble-playground:~# cobbler profile add --name=test --distro=Flatcar
+
+root@noble-playground:~# cobbler profile rename --name=test --newname=testFlatcar
+
+root@noble-playground:~# cobbler system add --name=testFlatcarVm --profile=testFlatcar --mac=52:54:00:fc:98:6f 
+
+Just reboot the test VM and wait for it to boot.
+
+cobbler mkloaders   # to build the bootloaders
+
+/usr/lib/syslinux/modules/bios/
+
+Flatcar: /cdrom/isolinux/pxelinux.0
+
+apt install ipxe isolinux grub-efi shim-signed pxelinux
+ln -s /bin/grub-mkimage /bin/grub2-mkimage
+
+DHCPDISCOVER sent.
+DHCPOFFER sent.
+No DHCPREQUEST or DHCPACK sent.
 
