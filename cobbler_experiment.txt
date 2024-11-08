@@ -133,3 +133,5 @@ DHCPDISCOVER sent.
 DHCPOFFER sent.
 No DHCPREQUEST or DHCPACK sent.
 
+Solution: /etc/cobbler/dhcp.template: add line "server-identifier 172.16.0.1;"
+
